@@ -1,3 +1,4 @@
-# MUSE-XAE
+# MUSE-XAE: MUtational Signature Extraction with
+eXplainable AutoEncoder
 
-![Descrizione dell'immagine](Images/MUSE_XAE.png)
+![](Images/MUSE_XAE.png)
