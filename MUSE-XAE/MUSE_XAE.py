@@ -24,19 +24,21 @@ if __name__ == '__main__':
     parser.add_argument('--augmentation', type=int, default=100,help='Number of data augmentation')
     parser.add_argument('--batch_size', type=int, default=64,help='Batch Size')
     parser.add_argument('--epochs', type=int, default=1000,help='Number of epochs')
-    parser.add_argument('--run', type=int, help='Parameter for multiple run to test robusteness')
     parser.add_argument('--mean_stability', type=int, help='Average Stability for accept a solution',default=0.7)
     parser.add_argument('--min_stability', type=int, help='Minimum Stability of a Signature to accept a solution',default=0.2)
     parser.add_argument('--directory', type=str, default='./', help='Main Directory to save results')
     parser.add_argument('--loss', type=str, default='poisson', help='Loss function to use in the autoencoder')
     parser.add_argument('--activation', type=str, default='softplus', help='activation function')
+    parser.add_argument('--run', type=int, help='Parameter for multiple run to test robusteness')
+    parser.add_argument('--n_jobs', type=int, help='number of cpu to use in parallel',required=False)
+
 
 
     args = parser.parse_args()
     data,iter,max_sig,min_sig=args.dataset,args.iter,args.max_sig,args.min_sig
     augmentation,batch_size,epochs=args.augmentation,args.batch_size,args.epochs
     mean_stability,min_stability,directory=args.mean_stability,args.min_stability,args.directory
-    loss,activation=args.loss,args.activation
+    loss,activation,n_jobs=args.loss,args.activation,args.n_jobs
 
     if args.run : 
         iteration=args.run
@@ -63,7 +65,7 @@ if __name__ == '__main__':
     
     # Signature extraction
     errors,extractions=optimal_model(X, iter=iter,max_sig=max_sig,min_sig=min_sig,loss=loss,batch_size=batch_size,epochs=epochs,augmentation=augmentation,activation=activation,
-                                     save_to=Models_dir)
+                                     save_to=Models_dir,n_jobs=n_jobs)
 
     min_cosine,mean_cosine,m_signatures,silhouettes=optimal_cosine_similarity(extractions,min_sig,max_sig)
     All_solutions_dir=f'{Main_dir}/All_Solutions/'
