@@ -11,8 +11,8 @@ MUSE-XAE is a user-friendly tool powered by the robust capabilities of autoencod
 
 MUSE-XAE assumes that the input tumor catalog is in .csv o .txt (with tab separated) format.
 The tumour catalogue `M` should be a `96xN` matrix where `N` is the number of tumours and `96` is the number of `SBS mutational classes`.
-MUSE-XAE assumes that 96 mutational classes order is the one of COSMIC. If you want to use a different order in your catalogue please add a 'Type' column with the desired order.
-Finally put your 'dataset' in the datasets folder.
+MUSE-XAE assumes that 96 mutational classes order is the one of `COSMIC`. If you want to use a different order in your catalogue please add a `Type` column with the desired order.
+Finally put your `dataset` in the datasets folder.
 
 ## Usage
 
