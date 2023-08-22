@@ -10,7 +10,8 @@ MUSE-XAE is a user-friendly tool powered by the robust capabilities of autoencod
 ## Input
 
 MUSE-XAE assumes that the input tumor catalog is in .csv o .txt (with tab separated) format.
-The tumour catalogue \[ M \in \mathbb{R}^{96 \times N} \] is the number of tumours and 96 is the number of SBS mutational classes.
+The tumour catalogue `M` should be `96xN` where `N` is the number of tumours and `96` is the number of `SBS mutational classes`.
+
 
 
 
@@ -25,7 +26,7 @@ To extract mutational signatures from on the PCAWG datasets run the following:
 The model gives the possibility to select the following arguments:
 
 - `--dataset`: **(Required)** Dataset name.
-- `--iter`: Number of repetitions for clustering. Default is `30.
+- `--iter`: Number of repetitions for clustering. Default is `30`.
 - `--max_sig`: Max signatures to explore. Default is `25`.
 - `--min_sig`: Min signatures to explore. Default is `2`.
 - `--augmentation`: Number of data augmentations. Default is `100`.
