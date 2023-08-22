@@ -2,7 +2,7 @@
 
 ![](Images/MUSE_XAE.png)
 
-MUSE-XAE is a user-friendly tool powered by the robust capabilities of autoencoder neural networks, allowing for the extraction and visualization of mutational signatures present in a tumor catalog. MUSE-XAE consists of a hybrid denoising autoencoder with a nonlinear encoder that enables the learning of nonlinear interactions and a linear decoder that ensures interpretability. Based on the conducted experiments, MUSE-XAE has proven to be one of the most performant and accurate tools in extracting mutational patterns. To delve deeper into its workings, please read the paper
+MUSE-XAE is a user-friendly tool powered by the robust capabilities of autoencoder neural networks, allowing for the extraction and visualization of mutational signatures present in a tumor catalog. MUSE-XAE consists of a hybrid denoising autoencoder with a nonlinear encoder that enables the learning of nonlinear interactions and a linear decoder that ensures interpretability. Based on the experiments, MUSE-XAE has proven to be one of the best performing and accurate tools in extracting mutational signatures. To delve deeper into its workings, please read the related paper
 
 ## Usage
 
@@ -10,12 +10,12 @@ We suggest to use MUSE-XAE with default parameters choosen based on experiments.
 
 For Example to extract mutational signatures on the PCAWG datasets run the following:
 
-python ./MUSE_XAE/MUSE_XAE.py --dataset PCAWG
+`python ./MUSE_XAE/MUSE_XAE.py --dataset PCAWG`
 
 The model gives the possibility to select the following arguments:
 
 - `--dataset`: **(Required)** Dataset name.
-- `--iter`: Number of repetitions for clustering. Default is `30`.
+- `--iter`: Number of repetitions for clustering. Default is `30.
 - `--max_sig`: Max signatures to explore. Default is `25`.
 - `--min_sig`: Min signatures to explore. Default is `2`.
 - `--augmentation`: Number of data augmentations. Default is `100`.
