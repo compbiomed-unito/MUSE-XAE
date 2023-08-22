@@ -1,3 +1,3 @@
 # MUSE-XAE
 
-![Descrizione dell'immagine](Images/MUSE_XAE.pdf)
+![Descrizione dell'immagine](Images/MUSE_XAE.png)
