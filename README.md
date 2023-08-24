@@ -7,7 +7,7 @@ MUSE-XAE is a user-friendly tool powered by the robust capabilities of autoencod
 
 ## Instructions
 
-After downloading the repo we suggest suggest to create a conda environment with the requirement libraries:
+After downloading the repo we suggest to create a conda environment with the requirement libraries:
 
 - `conda env create -f environment.yml -name env_name` 
 
