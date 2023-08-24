@@ -42,10 +42,10 @@ if __name__ == '__main__':
 
     if args.run : 
         iteration=args.run
-        Main_dir=f'./Experiments/{directory}/{data}/Run_{iteration}'
+        Main_dir=f'../Experiments/{directory}/{data}/Run_{iteration}'
         os.makedirs(Main_dir,exist_ok=True)
     else:
-        Main_dir=f'./Experiments/{directory}/{data}'
+        Main_dir=f'../Experiments/{directory}/{data}'
         os.makedirs(Main_dir,exist_ok=True)
 
     Models_dir=f'{Main_dir}/Models/'
@@ -104,13 +104,12 @@ if __name__ == '__main__':
             
     #Plot Signatures
 
-    try:
-        tumour_types=[column.split('::')[0] for column in X.index]
-    except:
-        try:
-            tumour_types=[column.split('-')[0] for column in X.index]
-        except:
-            tumour_types=None
+    if '::' in X.index[0]:    
+        tumour_types = [column.split('::')[0] for column in X.index]  
+    elif '-' in X.index[0]:
+        tumour_types = [column.split('-')[0] for column in X.index]
+    else:
+        tumour_types=None
             
     index_signatures=X.columns
     plot_results(X,S=S,E=E,sig_index=index_signatures,tumour_types=tumour_types,save_to=Main_dir+'/')
