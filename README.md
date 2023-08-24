@@ -25,13 +25,13 @@ Finally put your `dataset` in the datasets folder. To have an idea of the input 
 
 ## Usage
 
-We suggest to use MUSE-XAE with default parameters choosen based on experiments.
+We suggest to use MUSE-XAE with  `default` parameters choosen based on experiments.
 
 For example to extract mutational signatures from the `Example`  dataset run the following:
 
 `python ./MUSE_XAE/MUSE_XAE.py --dataset Example`
 
-The model gives also the possibility to select the other arguments:
+The model gives also the possibility to select optional arguments:
 
 - `--dataset`: **(Required)** Dataset name.
 - `--iter`: Number of repetitions for clustering. Default is `30`.
