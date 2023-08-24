@@ -49,6 +49,6 @@ The model gives also the possibility to select optional arguments:
 
 ## Output
 
-Running MUSE_XAE will generate an Experiments folder with some analysis and plots of your datasets>
+Running MUSE_XAE will generate an Experiments folder with some analysis and plots of your datasets
 
 
