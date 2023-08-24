@@ -6,23 +6,26 @@ MUSE-XAE is a user-friendly tool powered by the robust capabilities of autoencod
 
 
 ## Requirements
+To Run MUSE-XAE we suggest to create a conda environment with the requirement libraries:
+`conda create -env'
+
 
 ## Input
 
 MUSE-XAE assumes that the input tumor catalog is in .csv o .txt (with tab separated) format.
 The tumour catalogue `M` should be a `96xN` matrix where `N` is the number of tumours and `96` is the number of `SBS mutational classes`.
 MUSE-XAE assumes that 96 mutational classes order is the one of `COSMIC`. If you want to use a different order in your catalogue please add a `Type` column with the desired order.
-Finally put your `dataset` in the datasets folder.
+Finally put your `dataset` in the datasets folder. To have an idea of the input file structure you can find some examples in the `datasets` folder. 
 
 ## Usage
 
 We suggest to use MUSE-XAE with default parameters choosen based on experiments.
 
-To extract mutational signatures from on the PCAWG datasets run the following:
+For example to extract mutational signatures from the `Example`  dataset run the following:
 
-`python ./MUSE_XAE/MUSE_XAE.py --dataset PCAWG`
+`python ./MUSE_XAE/MUSE_XAE.py --dataset Example`
 
-The model gives the possibility to select the following arguments:
+The model gives also the possibility to select the other arguments:
 
 - `--dataset`: **(Required)** Dataset name.
 - `--iter`: Number of repetitions for clustering. Default is `30`.
@@ -39,6 +42,10 @@ The model gives the possibility to select the following arguments:
 - `--activation`: Activation function. Default is `softplus`.
 - `--n_jobs`: number of parallel jobs. Default is max_sig - min_sig.
 
-## TO DO LIST
-- update readme specifying input format and where to put datasets
+## Output
 
+
+
+## Plots
+
+- modificare tumor type e tsne plot
