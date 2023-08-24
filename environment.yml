@@ -1,0 +1,4 @@
+name: prova_env
+channels:
+  - defaults
+prefix: /archive/home/cpancott/MUSE-XAE/MUSE-XAE/ENTER/envs/prova_env
