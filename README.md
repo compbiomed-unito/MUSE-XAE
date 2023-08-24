@@ -50,8 +50,6 @@ The model gives also the possibility to select optional arguments:
 
 ## Output
 
+Running MUSE_XAE will generate an Experiments folder with some analysis and plots of your datasets>
 
 
-## Plots
-
-- modificare tumor type e tsne plot
