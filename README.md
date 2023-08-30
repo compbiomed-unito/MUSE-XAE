@@ -28,7 +28,7 @@ Finally put your `dataset` in the datasets folder. To have an idea of the input 
 We suggest to use MUSE-XAE with `default` parameters choosen based on experiments.
 To extract mutational signatures from the `Example` dataset run the following:
 
-`python ./MUSE_XAE/MUSE_XAE.py --dataset Example`
+`python ./MUSE-XAE/MUSE_XAE.py --dataset Example`
 
 The model gives also the possibility to select optional arguments:
 
