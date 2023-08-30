@@ -15,7 +15,7 @@ After downloading the repo we suggest to create a pip environment with the requi
 
 - Activate the environment: `source env_name/bin/activate`
 
-- Installing libraries: pip install -r requirements.txt
+- Installing libraries: `pip install -r requirements.txt`
 
 
 ## Input
