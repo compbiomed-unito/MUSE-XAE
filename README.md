@@ -7,13 +7,15 @@ MUSE-XAE is a user-friendly tool powered by the robust capabilities of autoencod
 
 ## Instructions
 
-After downloading the repo we suggest to create a conda environment with the requirement libraries:
+After downloading the repo we suggest to create a pip environment with the requirement libraries, folliwing the step:
 
-- `conda env create -f environment.yml -name env_name` 
+- Install pip:  `pip install virtualenv`
 
-Then activate the environment to Run MUSE_XAE:
+- Create the environment: `virtualenv env_name`
 
-- `conda activate env_name `
+- Activate the environment: `source env_name/bin/activate`
+
+- Installing libraries: pip install -r requirements.txt
 
 
 ## Input
