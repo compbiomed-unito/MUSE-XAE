@@ -1,11 +1,8 @@
-from inspect import Signature
-from re import T, X
 import pandas as pd
 import numpy as np
 import seaborn as sns
 import joblib
 import pickle
-import optuna
 import tensorflow as tf
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
@@ -13,19 +10,16 @@ import sklearn
 import warnings
 import os
 import h5py
+import sys
+import gc
+import multiprocessing
 from lap import lapjv
-from sklearn.cluster import KMeans
-from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import mean_squared_error,mean_absolute_error,cohen_kappa_score,matthews_corrcoef,balanced_accuracy_score
-from sklearn.preprocessing import MinMaxScaler,Normalizer
-from sklearn.model_selection import StratifiedKFold
 from sklearn.metrics.pairwise import cosine_similarity
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.manifold import TSNE
+from sklearn.cluster import KMeans
+import tensorflow.python.util.deprecation as deprecation
 from tensorflow.keras import activations,regularizers, constraints
 from tensorflow.keras.constraints import NonNeg,Constraint
 from tensorflow.keras.regularizers import OrthogonalRegularizer,L2
-from tensorflow.keras.initializers import Orthogonal,HeNormal,HeUniform,GlorotNormal,GlorotUniform
 from tensorflow.keras.callbacks import EarlyStopping,ModelCheckpoint
 from tensorflow.keras.layers import Input, Dense, Lambda,InputSpec,Layer,BatchNormalization,Dropout, Flatten
 from tensorflow.keras.models import Model
@@ -35,15 +29,16 @@ from tensorflow.keras.models import load_model
 from tensorflow.keras.optimizers.legacy import Adam
 from tensorflow.python.framework.ops import disable_eager_execution
 from scipy.optimize import linear_sum_assignment
-import sys
-import multiprocessing
 from matplotlib.backends.backend_pdf import PdfPages
 from PyPDF2 import PdfMerger
-import gc
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2' 
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1' 
 tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 tf.compat.v1.disable_eager_execution()
+tf.config.threading.set_intra_op_parallelism_threads(1)
+tf.config.threading.set_inter_op_parallelism_threads(1)
+deprecation._PRINT_DEPRECATION_WARNINGS = False
 
 
 class KMeans_with_matching:
@@ -78,7 +73,7 @@ class KMeans_with_matching:
 
         for k_iter in range(self.max_iter):
             cost = np.zeros((self.n, self.n))
-            for i in range(self.n_clusters): # rows are centroids
+            for i in range(self.n_clusters): 
                 for j in range(self.n):
                     cost[i,j]=1-cosine_similarity(self.X[j,:].reshape(1,-1),self.C[i,:].reshape(1,-1))
             for i in range(self.n_clusters, self.n):
@@ -89,7 +84,6 @@ class KMeans_with_matching:
                 self.C[i,:] = self.X[np.where(self.partition == i)].mean(axis=0)
             self.C_history.append(np.copy(self.C))
             if np.array_equal(self.C, self.C_prev):
-                print(f'Stopped at iteration {k_iter}')
                 break
             else:
                 self.C_prev = np.copy(self.C)
@@ -112,15 +106,18 @@ class minimum_volume(tf.keras.constraints.Constraint):
                 'beta': float(self.beta)}
 
 
-def load_dataset(name='PCAWG'):
+def load_dataset(name='PCAWG',cosmic_version='3.4'):
 
     try:
         data=pd.read_csv(f'./datasets/{name}.csv')
-
     except:
         data=pd.read_csv(f'./datasets/{name}.txt',sep='\t')
+    
+    if cosmic_version=='3.4':
 
-    COSMIC_sig=pd.read_csv('./datasets/COSMIC_SBS_GRCh37.txt',sep='\t').set_index('Type')
+        COSMIC_sig=pd.read_csv('./datasets/COSMIC_SBS_GRCh37_3.4.txt',sep='\t').set_index('Type')
+    else:
+        COSMIC_sig=pd.read_csv('./datasets/COSMIC_SBS_GRCh37.txt',sep='\t').set_index('Type')
 
     data=data.set_index('Type')
     data=data.loc[COSMIC_sig.index].T
@@ -145,28 +142,7 @@ def data_augmentation(X,augmentation=5,augmented=True):
     return X_aug
 
 
-def TSNE_plot(X,labels,name='tsne',save_to='./'):
-    
-    if len(X)<100:
-
-        perplexity=1
-    else:
-        perplexity=100
-
-    tsne = TSNE(n_components=2, random_state=1, perplexity=perplexity,metric='euclidean')
-    z = tsne.fit_transform(X)
-    df=pd.DataFrame()
-    df["Dim 1"] = z[:,0]
-    df["Dim 2"] = z[:,1]
-    df['label']=labels
-    fig,ax1 = plt.subplots(1, 1 , figsize=(12,10),sharex=True)
-    sns.scatterplot(x="Dim 1", y="Dim 2",hue='label',palette=sns.color_palette("hls", len(set(labels))),
-                    data=df,linewidth=0.8)                  
-    ax1.legend(loc='upper left',bbox_to_anchor=(1.04, 1))
-    plt.savefig(f'{save_to}{name}_tsne.pdf',dpi=400,bbox_inches='tight')
-
-
-def base_plot_signature(array, axs, ylim=1):
+def base_plot_signature(array, axs, index, ylim=1):
 
     color = ((0.196,0.714,0.863),)*16 + ((0.102,0.098,0.098),)*16 + ((0.816,0.180,0.192),)*16 + \
             ((0.777,0.773,0.757),)*16 + ((0.604,0.777,0.408),)*16 + ((0.902,0.765,0.737),)*16
@@ -180,10 +156,12 @@ def base_plot_signature(array, axs, ylim=1):
     bars = axs.bar(x, array, edgecolor='black', color=color)
 
     plt.ylim(0, ylim)
-    plt.xlim(0, width)
     plt.yticks(fontsize=10)
-    axs.set_ylabel('Frequency', fontsize=12)
+    axs.set_xlim(-0.5, width) 
+    axs.set_ylabel('Probability of mutation \n', fontsize=12)
     axs.set_xticks([])
+    axs.set_xticks(x)  
+    axs.set_xticklabels(index, rotation=90, fontsize=7)  
 
 
 def plot_signature(signatures, name='DeNovo_Signatures', save_to='./'):
@@ -207,9 +185,10 @@ def plot_signature(signatures, name='DeNovo_Signatures', save_to='./'):
     
     for signature in range(n_signatures):
 
-        fig, ax = plt.subplots(figsize=(10, 8))
+        fig, ax = plt.subplots(figsize=(16, 8))
         sns.set_style('darkgrid')
-        base_plot_signature(signatures.loc[index].values[:, signature], axs=ax, ylim=0.5)
+        s=signatures.loc[index].values[:, signature]
+        base_plot_signature(s, axs=ax, index=index, ylim=max(s)+0.05)
 
         l1 = mpatches.Patch(color=(0.196, 0.714, 0.863), label='C>A')
         l2 = mpatches.Patch(color=(0.102, 0.098, 0.098), label='C>G')
@@ -217,16 +196,18 @@ def plot_signature(signatures, name='DeNovo_Signatures', save_to='./'):
         l4 = mpatches.Patch(color=(0.777, 0.773, 0.757), label='T>A')
         l5 = mpatches.Patch(color=(0.604, 0.777, 0.408), label='T>C')
         l6 = mpatches.Patch(color=(0.902, 0.765, 0.737), label='T>G')
-
-        ax.set_title('SBS_AE_' + str(signature + 1)+'\n', fontsize=11, pad=20)
-        ax.legend(handles=[l1, l2, l3, l4, l5, l6], loc='upper center', ncol=6, bbox_to_anchor=(0.5, 1.05))
+        
+        ax.text(0.01, 0.94, f'MUSE-SBS'+str(chr(64 +signature + 1))+'\n', transform=ax.transAxes, fontsize=15, fontweight='bold', va='top', ha='left')
+        
+        #ax.set_title('SBS_AE_' + str(signature + 1)+'\n', fontsize=11, pad=20)
+        ax.legend(handles=[l1, l2, l3, l4, l5, l6], loc='upper center', ncol=6, bbox_to_anchor=(0.5, 1.1),fontsize=18)
 
         file_name = f'{save_to}{name}_{signature+1}.pdf'
         plt.savefig(file_name, dpi=400)
         merger.append(file_name)
         files_to_remove.append(file_name)
 
-    merger.write(f'{save_to}{name}_combined.pdf')
+    merger.write(f'{save_to}{name}.pdf')
     merger.close()
     
     # Removing the individual PDF files
@@ -277,7 +258,7 @@ def plot_optimal_solution(save_to,df_study,min_stability,mean_stability):
 
 def MUSE_XAE(input_dim=96,l_1=128,z=17,beta=0.001,activation='softplus',reg='min_vol',refit=False):
 
-    """ hybrid due to non linear encoder and linear decoder
+    """ hybrid autoencoder due to non linear encoder and linear decoder;
     NonNegativity constraint for the decoder """
 
     if reg=='min_vol': regularizer=minimum_volume(beta=beta,dim=z)
@@ -304,69 +285,51 @@ def MUSE_XAE(input_dim=96,l_1=128,z=17,beta=0.001,activation='softplus',reg='min
     hybrid_dae = Model(encoder_input,decoder)
     
     return hybrid_dae,encoder_model
-    
+
 
 def train_model(data, signatures, iter, batch_size, epochs, loss,augmentation,activation,save_to):
-    
-    errors, extractions = [], []
-    
+        
     X_scaled=normalize(data)
     
-    for i in range(iter):
+    X_aug_multi_scaled=normalize(data_augmentation(X=np.array(data), augmentation=augmentation))
 
-        X_aug_multi_scaled=normalize(data_augmentation(X=np.array(data), augmentation=augmentation))
+    model,encoder = MUSE_XAE(input_dim=96,z=signatures,activation=activation)
+    model.compile(optimizer=tf.keras.optimizers.legacy.Adam(), loss=loss, metrics=['mse'])
+    early_stopping=EarlyStopping(monitor='val_mse',patience=30)
+    checkpoint=ModelCheckpoint(f'{save_to}best_model_{signatures}_{iter}.h5', monitor='val_mse', save_best_only=True, verbose=False)
+    model.fit(X_aug_multi_scaled,X_aug_multi_scaled, epochs=epochs, batch_size=batch_size, verbose=False,validation_data=(X_scaled,X_scaled),callbacks=[early_stopping,checkpoint])
+    model_new = load_model(f'{save_to}best_model_{signatures}_{iter}.h5',custom_objects={"minimum_volume":minimum_volume(beta=0.001,dim=int(signatures))})
+    encoder_new = Model(inputs=model_new.input, outputs=model_new.get_layer('encoder_layer').output)
+    
+    S = model_new.layers[-1].get_weights()[0]
+    E = encoder_new.predict(X_scaled)
+    
+    error = np.linalg.norm(np.array(X_scaled) - np.array(E.dot(S)))
 
-        model,encoder = MUSE_XAE(input_dim=96,z=signatures,activation=activation)
-        model.compile(optimizer=tf.keras.optimizers.legacy.Adam(), loss=loss, metrics=['mse'])
-        early_stopping=EarlyStopping(monitor='val_mse',patience=20)
-        checkpoint=ModelCheckpoint(f'{save_to}best_model_{signatures}.h5', monitor='val_mse', save_best_only=True, verbose=1)
-        model.fit(X_aug_multi_scaled,X_aug_multi_scaled, epochs=epochs, batch_size=batch_size, verbose=False,validation_data=(X_scaled,X_scaled),callbacks=[early_stopping,checkpoint])
-        model_new = load_model(f'{save_to}best_model_{signatures}.h5',custom_objects={"minimum_volume":minimum_volume(beta=0.001,dim=int(signatures))})
-        encoder_new = Model(inputs=model_new.input, outputs=model_new.get_layer('encoder_layer').output)
-        
-        S = model_new.layers[-1].get_weights()[0]
-        E = encoder_new.predict(X_scaled)
-        
-        # prediction
-
-        error = np.linalg.norm(np.array(X_scaled) - np.array(E.dot(S)))
-        errors.append(error)
-        extractions.append(S.T)
-
-        del model, model_new, encoder, encoder_new, S, E,checkpoint, early_stopping, X_aug_multi_scaled
-        gc.collect()
-
-    mean_error = np.mean(errors)
-    std_error = np.std(errors)
+    return error, S.T
 
 
-    threshold = mean_error + 2 * std_error
-
-    extractions = [extraction for extraction, error in zip(extractions, errors) if error <= threshold]
-    errors = [error for extraction, error in zip(extractions, errors) if error <= threshold]
-
-    return errors, extractions
-
-
-def optimal_model(data, iter, min_sig, max_sig, loss , batch_size, epochs, augmentation, activation , save_to='./',n_jobs=-1):
+def optimal_model(data, iter, min_sig, max_sig, loss , batch_size, epochs, augmentation, activation ,n_jobs, save_to='./'):
     
     # parallelize model training
-    if n_jobs==-1:
-        pool = multiprocessing.Pool(processes=max_sig - min_sig + 1)
-    else:
-        pool = multiprocessing.Pool(processes=n_jobs)
 
     results = {}
-    for signatures in range(min_sig, max_sig + 1):
-        result = pool.apply_async(train_model, (data, signatures, iter, batch_size, epochs , loss, augmentation, activation, save_to))
-        results[signatures] = result
+    with multiprocessing.Pool(processes=n_jobs, maxtasksperchild=1) as pool:
+        for signatures in range(min_sig, max_sig + 1):
+            for i in range(iter):
+                results[(signatures, i)] = pool.apply_async(train_model, (data, signatures, i, batch_size, epochs , loss, augmentation, activation, save_to))
 
-    # collect errors and extractions from all processes
-    all_errors, all_extractions = {}, {}
-    for signatures, result in results.items():
-        errors, extractions = result.get()
-        all_errors[signatures] = errors
-        all_extractions[signatures] = extractions
+        all_errors, all_extractions = {}, {}
+
+        for signatures in range(min_sig, max_sig + 1):
+            errors, extractions = [], []
+            for i in range(iter):
+                error, S = results[(signatures, i)].get()
+                errors.append(error)
+                extractions.append(S)
+
+            all_errors[signatures] = errors
+            all_extractions[signatures] = extractions
 
     return all_errors, all_extractions
 
@@ -375,7 +338,6 @@ def calc_cosine_similarity(args):
     
     sig, all_extractions = args
     all_extraction_df = pd.concat([pd.DataFrame(df) for df in all_extractions[sig]], axis=1).T
-    #all_extraction_df=all_extractions[sig].copy()
     X_all = np.asarray(all_extraction_df)
     clustering_model = KMeans_with_matching(X=X_all, n_clusters=sig, max_iter=50)
     consensus_sig, cluster_labels = clustering_model.fit_predict()
@@ -422,7 +384,7 @@ def refit(data,S,best,save_to='./'):
     model.layers[-1].trainable=False 
 
     early_stopping=EarlyStopping(monitor='loss',patience=100)
-    checkpoint=ModelCheckpoint(f'{save_to}best_model_refit.h5', monitor='loss', save_best_only=True, verbose=1)
+    checkpoint=ModelCheckpoint(f'{save_to}best_model_refit.h5', monitor='loss', save_best_only=True, verbose=False)
     model.compile(optimizer=Adam(learning_rate=0.001),loss='mse',metrics=['mse','kullback_leibler_divergence'])
     history=model.fit(X,X,epochs=10000,batch_size=64,verbose=False,validation_data=(X,X),callbacks=[early_stopping,checkpoint])
       
@@ -432,82 +394,45 @@ def refit(data,S,best,save_to='./'):
 
     E = E.T.apply(lambda x: x / (sum(x) + 1e-10)) * np.array(original_data.sum(axis=1))
     E=E.T.round()
-
-    plt.figure(figsize=(10, 6))
-    plt.plot(history.history['mse'])
-
-    plt.title('Model MSE')
-    plt.ylabel('MSE')
-    plt.xlabel('Epoch')
-    #plt.savefig(f'{save_to}/refit_plot.pdf',dpi=400,bbox_inches='tight')
     
     return E
 
-def plot_results(data,S,E,sig_index,tumour_types,save_to):
+def plot_results(data,S,E,sig_index,tumour_types,save_to,cosmic_version):
 
     X=np.array(data)
     S=pd.DataFrame(S)
     E=pd.DataFrame(E)
     S.index=sig_index
     S=S.apply(lambda x : x/sum(x))
-    S.columns=[ f'SBS_AE_{i+1}' for i in range(0,S.shape[1])]
-    E.columns=[ f'SBS_AE_{i+1}' for i in range(0,E.shape[1])]
+    S.columns=[ f'MUSE-SBS{chr(64+i+1)}' for i in range(0,S.shape[1])]
+    E.columns=[ f'MUSE-SBS{chr(64+i+1)}' for i in range(0,E.shape[1])]
 
     Extraction_dir=f'{save_to}Suggested_SBS_De_Novo/'
     os.makedirs(Extraction_dir,exist_ok=True)
 
-    S.to_csv(f'{Extraction_dir}SBS_AE.csv')
-    E.to_csv(f'{Extraction_dir}EXP_AE.csv')
+    S.to_csv(f'{Extraction_dir}MUSE_SBS.csv')
+    E.index=tumour_types
+    E.to_csv(f'{Extraction_dir}MUSE_EXP.csv')
 
-    COSMIC_sig=pd.read_csv('./datasets/COSMIC_SBS_GRCh37.txt',sep='\t').set_index('Type')
+    if cosmic_version=='3.4':
+        
+        COSMIC_sig=pd.read_csv('./datasets/COSMIC_SBS_GRCh37_3.4.txt',sep='\t').set_index('Type')
+    
+    else:
+        COSMIC_sig=pd.read_csv('./datasets/COSMIC_SBS_GRCh37.txt',sep='\t').set_index('Type')
+    
     cost=pd.DataFrame(cosine_similarity(S.T,COSMIC_sig.T))
     row_ind,col_ind=linear_sum_assignment(1-cost)
     reoreder_sig=S.iloc[:,row_ind]
     COSMIC=COSMIC_sig.iloc[:,col_ind]
     cosmic_match=pd.DataFrame([cosine_similarity(reoreder_sig.iloc[:,i].ravel().reshape(1,-1),COSMIC.iloc[:,i].ravel().reshape(1,-1))[0] for i in range(COSMIC.shape[1])],columns=['similiarity'])
-    cosmic_match.insert(0,'SBS_AE',reoreder_sig.columns)
-    cosmic_match.insert(1,'SBS_COSMIC',COSMIC.columns)
+    cosmic_match.insert(0,'MUSE-SBS',reoreder_sig.columns)
+    cosmic_match.insert(1,'COSMIC-SBS',COSMIC.columns)
     cosmic_match.to_csv(f'{Extraction_dir}COSMIC_match.csv')
     
     Plot_dir=f'{save_to}Plots/'
 
     plot_signature(reoreder_sig,save_to=Plot_dir)
-    
-    if (tumour_types is not None and E.shape[1]>2) :
-        TSNE_plot(E,tumour_types,name='Exposures',save_to=Plot_dir) 
-
-def classification_from_representation(X,y,fold=5,save_to='./'):
-    
-    X=np.array(X)
-
-    skf = StratifiedKFold(n_splits=fold,shuffle=True,random_state=12)
-    
-    mccs,cohens,b_accs=[],[],[]
-    
-    for i, (train_index, test_index) in enumerate(skf.split(X,y)):
-              
-       y_train=np.array(pd.get_dummies(y).idxmax(axis=1))[train_index]
-       y_test=np.array(pd.get_dummies(y).idxmax(axis=1))[test_index]
-       X_train=X[train_index]
-       X_test=X[test_index]
-
-       RF = RandomForestClassifier(n_estimators=1000, class_weight='balanced')
-       RF.fit(X_train, y_train)
-       y_pred = RF.predict(X_test)
-       cohen = cohen_kappa_score(y_test,y_pred)
-       mcc = matthews_corrcoef(y_test,y_pred)
-       b_acc=balanced_accuracy_score(y_test,y_pred)
-       cohens.append(cohen)
-       mccs.append(mcc)
-       b_accs.append(b_acc)
-    
-    Classification_dir=f'{save_to}Classification/'
-    os.makedirs(Classification_dir,exist_ok=True)
-
-    with open(f'{Classification_dir}classication_performance.txt','w') as f:
-        f.write(f'BALANCE ACCURACY: {np.mean(b_accs)} +_ {np.std(b_accs)} \n')
-        f.write(f'MCC: {np.mean(mccs)} +_ {np.std(mccs)} \n')
-        f.write(f'KAPPA: {np.mean(cohens)} +_ {np.std(cohens)} \n')
 
 
     
