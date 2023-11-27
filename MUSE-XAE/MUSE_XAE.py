@@ -105,7 +105,7 @@ if __name__ == '__main__':
     E=refit(X,S=S,best=best,save_to=Models_dir)
 
             
-    #Plot signatures
+    #Plot extracted signatures
     try:
         tumour_types=[column.split('::')[0] for column in X.index]
     except:
