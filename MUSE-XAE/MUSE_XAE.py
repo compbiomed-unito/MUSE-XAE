@@ -1,4 +1,3 @@
-from ast import Mod
 import numpy as np
 import pandas as pd
 import joblib
@@ -10,6 +9,8 @@ import argparse
 from sklearn.preprocessing import MinMaxScaler
 from tensorflow.python.framework.ops import disable_eager_execution
 from utils import load_dataset,plot_optimal_solution,plot_signature,train_model,optimal_model,calc_cosine_similarity,optimal_cosine_similarity,refit,plot_results
+import warnings
+warnings.filterwarnings("ignore")
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
@@ -31,17 +32,17 @@ if __name__ == '__main__':
     parser.add_argument('--activation', type=str, default='softplus', help='activation function')
     parser.add_argument('--cosmic_version',type=str,help='cosmic version for matching extracted signatures',default='3.4')
     parser.add_argument('--run', type=int, help='Parameter for multiple run to test robusteness',required=False,default=None)
-    parser.add_argument('--n_jobs', type=int, help='number of cpu to use in parallel',required=False,default=-1)
+    parser.add_argument('--n_jobs', type=int, help='number of cpu to use in parallel',required=False,default=24)
 
     args = parser.parse_args()
     data,iter,max_sig,min_sig=args.dataset,args.iter,args.max_sig,args.min_sig
     augmentation,batch_size,epochs=args.augmentation,args.batch_size,args.epochs
     mean_stability,min_stability,directory=args.mean_stability,args.min_stability,args.directory
     loss,activation,n_jobs,cosmic_version=args.loss,args.activation,args.n_jobs,args.cosmic_version
-
-    if args.run :
+    
+    if args.run:
         iteration=args.run
-        Main_dir=f'./Experiments/{directory}/{data}/Run_{iteration}'
+        Main_dir=f"./Experiments/{directory}/{data}/Run_{iteration}"
         os.makedirs(Main_dir,exist_ok=True)
     else:
         Main_dir=f'./Experiments/{directory}/{data}'

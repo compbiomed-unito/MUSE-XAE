@@ -31,6 +31,9 @@ from scipy.optimize import linear_sum_assignment
 from matplotlib.backends.backend_pdf import PdfPages
 from PyPDF2 import PdfMerger
 
+import warnings
+warnings.filterwarnings("ignore")
+
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2' 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1' 
 tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
