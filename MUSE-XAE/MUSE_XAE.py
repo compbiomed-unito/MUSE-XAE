@@ -30,7 +30,7 @@ if __name__ == '__main__':
     parser.add_argument('--loss', type=str, default='poisson', help='Loss function to use in the autoencoder')
     parser.add_argument('--activation', type=str, default='softplus', help='activation function')
     parser.add_argument('--cosmic_version',type=str,help='cosmic version for matching extracted signatures',default='3.4')
-    parser.add_argument('--run', type=int, help='Parameter for multiple run to test robusteness')
+    parser.add_argument('--run', type=int, help='Parameter for multiple run to test robusteness',default=None)
     parser.add_argument('--n_jobs', type=int, help='number of cpu to use in parallel',required=False,default=-1)
 
     args = parser.parse_args()
