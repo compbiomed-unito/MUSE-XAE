@@ -9,6 +9,9 @@ import matplotlib.patches as mpatches
 import sklearn
 import warnings
 import os
+os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1' 
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2' 
 import h5py
 import sys
 import gc
@@ -31,13 +34,9 @@ from scipy.optimize import linear_sum_assignment
 from matplotlib.backends.backend_pdf import PdfPages
 from PyPDF2 import PdfMerger
 
-import warnings
-warnings.filterwarnings("ignore")
 
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2' 
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1' 
-tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 tf.compat.v1.disable_eager_execution()
+tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 tf.config.threading.set_intra_op_parallelism_threads(1)
 tf.config.threading.set_inter_op_parallelism_threads(1)
 
@@ -322,6 +321,8 @@ def optimal_model(data, iter, min_sig, max_sig, loss , batch_size, epochs, augme
         all_errors, all_extractions = {}, {}
 
         for signatures in range(min_sig, max_sig + 1):
+            print('')
+            print(f'Running {iter} iterations with {signatures} mutational signatures ...')
             errors, extractions = [], []
             for i in range(iter):
                 error, S = results[(signatures, i)].get()
@@ -374,10 +375,17 @@ def optimal_cosine_similarity(all_extractions, min_sig=2,max_sig=15):
 
 
 def refit(data,S,best,save_to='./'):
+    print(' ')
+    print('--------------------------------------------------')
+    print(' ')
+    print('   Assigning mutations to extracted signatures')
+    print(' ')
+    print('--------------------------------------------------')
+    print('')
     
     original_data=np.array(data)
     X=normalize(data)
-
+    
     model,encoder_model = MUSE_XAE(input_dim=96,z=int(best['signatures']),refit=True)
     S=S.apply(lambda x : x/sum(x))
     model.layers[-1].set_weights([np.array(S.T)])
@@ -433,6 +441,10 @@ def plot_results(data,S,E,sig_index,tumour_types,save_to,cosmic_version):
     Plot_dir=f'{save_to}Plots/'
 
     plot_signature(reoreder_sig,save_to=Plot_dir)
+    
+    print('')
+    print('Thank you for using MUSE-XAE. Check the results on the Experiments folder')
+    print('')
 
 
     

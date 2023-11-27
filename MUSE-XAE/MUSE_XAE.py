@@ -1,10 +1,12 @@
 import numpy as np
 import pandas as pd
 import joblib
+import os
+os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1' 
 import tensorflow as tf
 import sys
 import pickle
-import os
 import argparse
 from sklearn.preprocessing import MinMaxScaler
 from tensorflow.python.framework.ops import disable_eager_execution
@@ -12,7 +14,6 @@ from utils import load_dataset,plot_optimal_solution,plot_signature,train_model,
 import warnings
 warnings.filterwarnings("ignore")
 
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 
 if __name__ == '__main__':
@@ -40,6 +41,13 @@ if __name__ == '__main__':
     mean_stability,min_stability,directory=args.mean_stability,args.min_stability,args.directory
     loss,activation,n_jobs,cosmic_version=args.loss,args.activation,args.n_jobs,args.cosmic_version
     
+    print(' ')
+    print('--------------------------------------------------')
+    print(' ')
+    print('         De Novo Extraction with MUSE-XAE')
+    print(' ')
+    print('--------------------------------------------------')
+          
     if args.run:
         iteration=args.run
         Main_dir=f"./Experiments/{directory}/{data}/Run_{iteration}"
@@ -62,7 +70,7 @@ if __name__ == '__main__':
 
     # Load data
     X=load_dataset(name=data,cosmic_version=cosmic_version)
-    
+
     # Signature extraction
     errors,extractions=optimal_model(X, iter=iter,max_sig=max_sig,min_sig=min_sig,loss=loss,batch_size=batch_size,epochs=epochs,augmentation=augmentation,activation=activation,n_jobs=n_jobs,
                                      save_to=Models_dir)
