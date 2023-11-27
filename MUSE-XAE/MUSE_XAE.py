@@ -8,13 +8,11 @@ import pickle
 import os
 import argparse
 from sklearn.preprocessing import MinMaxScaler
-import tensorflow.python.util.deprecation as deprecation
 from tensorflow.python.framework.ops import disable_eager_execution
 from utils import load_dataset,plot_optimal_solution,plot_signature,train_model,optimal_model,calc_cosine_similarity,optimal_cosine_similarity,refit,plot_results
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
-deprecation._PRINT_DEPRECATION_WARNINGS = False
 
 if __name__ == '__main__':
 

@@ -16,7 +16,6 @@ import multiprocessing
 from lap import lapjv
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.cluster import KMeans
-import tensorflow.python.util.deprecation as deprecation
 from tensorflow.keras import activations,regularizers, constraints
 from tensorflow.keras.constraints import NonNeg,Constraint
 from tensorflow.keras.regularizers import OrthogonalRegularizer,L2
@@ -38,7 +37,6 @@ tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 tf.compat.v1.disable_eager_execution()
 tf.config.threading.set_intra_op_parallelism_threads(1)
 tf.config.threading.set_inter_op_parallelism_threads(1)
-deprecation._PRINT_DEPRECATION_WARNINGS = False
 
 
 class KMeans_with_matching:
