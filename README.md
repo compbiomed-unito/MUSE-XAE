@@ -15,6 +15,11 @@ After downloading the repository we suggest to create a conda environment with p
 
 - Installing other libraries: `pip install -r requirements.txt`
 
+## Availability
+
+MUSE-XAE is currently available through GitHub and the code runs only on CPU, 
+but it will soon be available as an installable Python package and will be able to run on GPU
+
 
 ## Input
 
