@@ -49,7 +49,7 @@ The model gives also the possibility to select optional arguments:
 - `--directory`: Main Directory to save results. Default is `./`.
 - `--loss`: Loss function to use in the autoencoder. Default is `poisson`.
 - `--activation`: Activation function. Default is `softplus`.
-- `--n_jobs`: number of parallel jobs. Default is `-1`.
+- `--n_jobs`: number of parallel jobs. Default is `24`.
 - `--cosmic_version`: Cosmic version reference. Default is `3.4` .
 
 
