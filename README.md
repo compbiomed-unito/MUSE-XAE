@@ -1,6 +1,6 @@
 # MUtational Signature Extraction with eXplainable AutoEncoder
 
-![](Images/MUSE_XAE.png)
+![](Images/MUSE-XAE.png)
 
 MUSE-XAE is a user-friendly tool powered by the robust capabilities of autoencoder neural networks, allowing for the extraction and visualization of SBS mutational signatures present in a tumor catalog. MUSE-XAE consists of a hybrid denoising autoencoder with a nonlinear encoder that enables the learning of nonlinear interactions and a linear decoder that ensures interpretability. Based on the experiments, MUSE-XAE has proven to be one of the best performing and accurate tools in extracting mutational signatures. To delve deeper into its workings, please read the related paper
 
@@ -58,5 +58,7 @@ The model gives also the possibility to select optional arguments:
 Running MUSE_XAE will generate an `Experiments` folder with `All_Solutions`, `Plots` and `Suggested_DeNovo_SBS` subfolders.
 In Plots folder you can find signature plot like the ones below and in Suggested_SBSB_DeNovo csv files for the extracted signatures and its relative exposures 
 and the match with COSMIC database.
+
+![](Images/Plot_signature.png)
 
 
