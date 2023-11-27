@@ -1,4 +1,4 @@
-# MUtational Signature Extraction with eXplainable AutoEncoder
+# MUtational Signatures Extraction with eXplainable AutoEncoder
 
 ![](Images/MUSE-XAE.png)
 
