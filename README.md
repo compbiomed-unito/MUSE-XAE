@@ -36,7 +36,7 @@ The model gives also the possibility to select optional arguments:
 
 - `--dataset`: **(Required)** Dataset name.
 - `--augmentation`: Number of times of data augmentation. Default is `100`.
-- `--iter`: Number of repetitions for clustering. Default is `30`.
+- `--iter`: Number of repetitions for clustering. Default is `100`.
 - `--max_sig`: Max signatures to explore. Default is `25`.
 - `--min_sig`: Min signatures to explore. Default is `2`.
 - `--batch_size`: Batch Size. Default is `64`.
@@ -47,10 +47,14 @@ The model gives also the possibility to select optional arguments:
 - `--directory`: Main Directory to save results. Default is `./`.
 - `--loss`: Loss function to use in the autoencoder. Default is `poisson`.
 - `--activation`: Activation function. Default is `softplus`.
-- `--n_jobs`: number of parallel jobs. Default is max_sig - min_sig.
+- `--n_jobs`: number of parallel jobs. Default is `-1`.
+- `--cosmic_version`: Cosmic version reference. Default is `3.4` .
+
 
 ## Output
 
-Running MUSE_XAE will generate an Experiments folder with some analysis and plots of your datasets
+Running MUSE_XAE will generate an Experiments folder with All_Solutions, Plots and SBS_DeNovo_Solution subfolders.
+In Plots folder you can find signature plot like the ones below and in Suggested_SBSB_DeNovo csv files for the extracted signatures and its relative exposures 
+and the match with COSMIC database.
 
 
