@@ -9,7 +9,9 @@ MUSE-XAE is a user-friendly tool powered by the robust capabilities of autoencod
 
 After downloading the repo we suggest to create a pip environment with the requirement libraries, folliwing the step:
 
-- Install pip:  `pip install virtualenv`
+- install python 3.10
+
+- Install pip virtual environment:  `pip install virtualenv`
 
 - Create the environment: `virtualenv env_name`
 
