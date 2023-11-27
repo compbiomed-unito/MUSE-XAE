@@ -53,7 +53,7 @@ The model gives also the possibility to select optional arguments:
 
 ## Output
 
-Running MUSE_XAE will generate an Experiments folder with All_Solutions, Plots and SBS_DeNovo_Solution subfolders.
+Running MUSE_XAE will generate an `Experiments` folder with `All_Solutions`, `Plots` and `Suggested_DeNovo_SBS` subfolders.
 In Plots folder you can find signature plot like the ones below and in Suggested_SBSB_DeNovo csv files for the extracted signatures and its relative exposures 
 and the match with COSMIC database.
 
