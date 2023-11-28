@@ -443,7 +443,7 @@ def plot_results(data,S,E,sig_index,tumour_types,save_to,cosmic_version):
     plot_signature(reoreder_sig,save_to=Plot_dir)
     
     print(' ')
-    print('Thank you for using MUSE-XAE. Check the results on the Experiments folder')
+    print('Thank you for using MUSE-XAE! Check the results on the Experiments folder')
     print(' ')
 
 
