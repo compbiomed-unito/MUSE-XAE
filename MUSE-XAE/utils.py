@@ -425,7 +425,7 @@ def plot_results(data,S,E,sig_index,tumour_types,save_to,cosmic_version):
     if cosmic_version=='3.4':
         
         COSMIC_sig=pd.read_csv('./datasets/COSMIC_SBS_GRCh37_3.4.txt',sep='\t').set_index('Type')
-    
+ 
     else:
         COSMIC_sig=pd.read_csv('./datasets/COSMIC_SBS_GRCh37.txt',sep='\t').set_index('Type')
     
@@ -442,9 +442,9 @@ def plot_results(data,S,E,sig_index,tumour_types,save_to,cosmic_version):
 
     plot_signature(reoreder_sig,save_to=Plot_dir)
     
-    print('')
+    print(' ')
     print('Thank you for using MUSE-XAE. Check the results on the Experiments folder')
-    print('')
+    print(' ')
 
 
     

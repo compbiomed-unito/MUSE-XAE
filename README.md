@@ -29,11 +29,17 @@ MUSE-XAE assumes that 96 mutational classes order is the one of `COSMIC`. If you
 Finally put your `dataset` in the datasets folder. To have an idea of the input file structure you can find some examples in the `datasets` folder. 
 All datasets reported in this repo and used in the paper are taken from `Uncovering novel mutational signatures by de novo extraction with SigProfilerExtractor` from Islam et al.
 
+## Example Usage
 
-## Usage
+For a quick test with the `Example` dataset run the following:
+
+`python ./MUSE-XAE/MUSE_XAE.py --dataset Example --iter 5  --min_sig 2 --max_sig 5` 
+
+
+## Complete Usage
 
 We suggest to use MUSE-XAE with `default` parameters choosen based on experiments.
-To extract mutational signatures from the `Example` dataset run the following:
+To extract mutational signatures with default parameters on the Example dataset run the following:
 
 `python ./MUSE-XAE/MUSE_XAE.py --dataset Example`
 
@@ -59,9 +65,10 @@ The model gives also the possibility to select optional arguments:
 ## Output
 
 Running MUSE-XAE will generate an `Experiments` folder with different subfolders.
-In Plots folder you can find signature plot like the ones below and in Suggested_SBSB_DeNovo csv files for the extracted signatures and its relative exposures 
+In `Plots` folder you can find signature plot (like the ones below) and in `Suggested_SBSB_DeNovo` you can find csv files for the extracted signatures and its relative exposures 
 and the match with COSMIC database.
 
 ![](Images/Plot_signature.png)
+
 
 
