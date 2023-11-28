@@ -27,6 +27,10 @@ MUSE-XAE assumes that the input tumor catalog is in .csv o .txt (with tab separa
 The tumour catalogue `M` should be a `96xN` matrix where `N` is the number of tumours and `96` is the number of `SBS mutational classes`.
 MUSE-XAE assumes that 96 mutational classes order is the one of `COSMIC`. If you want to use a different order in your catalogue please add a `Type` column with the desired order.
 Finally put your `dataset` in the datasets folder. To have an idea of the input file structure you can find some examples in the `datasets` folder. 
+In the following image we show the first five rows of the example dataset for simplicity. 
+
+![](Images/Example_dataset.png)
+
 All datasets reported in this repo and used in the paper are taken from `Uncovering novel mutational signatures by de novo extraction with SigProfilerExtractor` from Islam et al.
 
 ## Example Usage
