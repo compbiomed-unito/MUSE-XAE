@@ -7,7 +7,7 @@ MUSE-XAE is a user-friendly tool powered by the robust capabilities of autoencod
 
 ## Instructions
 
-After downloading the repository we suggest to create a conda environment with python 3.10 and 1.24.0 numpy consequently install the requirement libraries via pip, folliwing the step:
+After downloading the repository we suggest to create a conda environment with python 3.10 and 1.24.3 numpy consequently install the requirement libraries via pip, folliwing the step:
 
 - Create the environment: `conda create -n MUSE_env python=3.10 numpy=1.24.3`
 
