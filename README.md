@@ -31,7 +31,7 @@ In the following image we show the first five rows of the example dataset for si
 
 ![](Images/Example_dataset.png)
 
-All datasets reported in this repo and used in the paper are taken from `Uncovering novel mutational signatures by de novo extraction with SigProfilerExtractor` from Islam et al.
+All datasets reported in this repo and used in the paper are taken from `Uncovering novel mutational signatures by de novo extraction with SigProfilerExtractor` from Islam et al. [[link]](https://doi.org/10.1016/j.xgen.2022.100179)
 
 ## Example Usage
 
