@@ -32,10 +32,10 @@ def denovo_extraction(args):
 
     if args.run :
         iteration=args.run
-        Main_dir=f'../Experiments/{directory}/{data}/Run_{iteration}'
+        Main_dir=f'./Experiments/{directory}/{data}/Run_{iteration}'
         os.makedirs(Main_dir,exist_ok=True)
     else:
-        Main_dir=f'../Experiments/{directory}/{data}'
+        Main_dir=f'./Experiments/{directory}/{data}'
         os.makedirs(Main_dir,exist_ok=True)
 
     Models_dir=f'{Main_dir}/Models/'

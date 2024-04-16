@@ -5,15 +5,15 @@ import numpy as np
 def load_dataset(name='PCAWG',cosmic_version='3.4'):
 
     try:
-        data=pd.read_csv(f'../datasets/{name}.csv')
+        data=pd.read_csv(f'./datasets/{name}.csv')
     except:
-        data=pd.read_csv(f'../datasets/{name}.txt',sep='\t')
+        data=pd.read_csv(f'./datasets/{name}.txt',sep='\t')
     
     if cosmic_version=='3.4':
 
-        COSMIC_sig=pd.read_csv('../datasets/COSMIC_SBS_GRCh37_3.4.txt',sep='\t').set_index('Type')
+        COSMIC_sig=pd.read_csv('./datasets/COSMIC_SBS_GRCh37_3.4.txt',sep='\t').set_index('Type')
     else:
-        COSMIC_sig=pd.read_csv('../datasets/COSMIC_SBS_GRCh37.txt',sep='\t').set_index('Type')
+        COSMIC_sig=pd.read_csv('./datasets/COSMIC_SBS_GRCh37.txt',sep='\t').set_index('Type')
 
     data=data.set_index('Type')
     data=data.loc[COSMIC_sig.index].T
