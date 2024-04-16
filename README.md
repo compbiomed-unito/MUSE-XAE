@@ -18,12 +18,14 @@ After downloading the repository we suggest to create a conda environment with p
 ## Availability
 
 MUSE-XAE is currently available through GitHub and the code runs only on CPU, 
-but it will soon be available as an installable Python package and will be able to run on GPU
+but it will soon be available as an installable Python package and will be able to run on GPU.
+
+MUSE-XAE is constituted by to main modules: `MUSE-XAE De-Novo Extraction` and `MUSE-XAE Refitting`
 
 
-## Input
+## Input Data 
 
-MUSE-XAE assumes that the input tumor catalog is in .csv o .txt (with tab separated) format.
+In general both `MUSE-XAE De-Novo Extraction` and `MUSE-XAE Refitting` modules assumes that the input tumor catalog is in .csv o .txt (with tab separated) format.
 The tumour catalogue `M` should be a `96xN` matrix where `N` is the number of tumours and `96` is the number of `SBS mutational classes`.
 MUSE-XAE assumes that 96 mutational classes order is the one of `COSMIC`. If you want to use a different order in your catalogue please add a `Type` column with the desired order.
 Finally put your `dataset` in the datasets folder. To have an idea of the input file structure you can find some examples in the `datasets` folder. 
@@ -33,17 +35,36 @@ In the following image we show the first five rows of the example dataset for si
 
 All the synthetic datasets reported in this repo and used in the paper are taken from `Uncovering novel mutational signatures by de novo extraction with SigProfilerExtractor` from Islam et al. [[1]](https://doi.org/10.1016/j.xgen.2022.100179). Links are provided in the reproducibility notebook inside the notebook folder. 
 
-## Example Usage
+## Refitting with known Mutational Signatures
 
-For a quick test with the `Example` dataset run the following:
+`MUSE-XAE Refitting` module perform a consensus refitting made by `10` repetition of MUSE-XAE refitting algorithm to increase robustness and
+reliability of assignment.
 
-`python ./MUSE-XAE/main.py --dataset Example --iter 5  --min_sig 2 --max_sig 5` 
+To `Refit` COSMIC signatures to an `Example` dataset run the following:
+
+`python ./MUSE-XAE/main.py --dataset Example --refit_only True`
+
+By default the reference set is the `COSMIC v3.4` SBS signatures. If you want to add your own reference set add `--reference_set Signatures_set` to the previous line.
+You need to be sure that your `Signatures_set` is in the `dataset` folder.
+We suggest to use the `default` parameters but you can also specifiy the following parameters:
+
+-`--dataset`: **(Required)** Dataset name.
+-`--refit_regularizer`: Refit Penalty type. Default is `l1`
+-`--refit_penalty`: Refit Penalty amount. Default is `0.003`
+-`--refit_loss`: Refit Loss function. Default is `mae`
+-`--reference_set`: Signature Set to Refit. Default is `COSMIC_SBS_GRCh37_3.4`
+-`--remove_artefact`: Remove known artefact. Default is `True`
+-`--refit_patience`: Patience before stopping the refitting. Default is `200`
+-`--n_jobs`: Number of cpu to use in parallel. Default is `12`
 
 
-## Complete Usage
+## De-Novo Extraction of Mutational Signatures 
 
-We suggest to use MUSE-XAE with `default` parameters choosen based on experiments.
-To extract mutational signatures with default parameters on the Example dataset run the following:
+`MUSE-XAE De-Novo Extraction` module perform De-Novo Extraction of mutational signatures and then uses `MUSE-XAE Refitting` module
+to assign mutations to the extracted signatures.
+
+We suggest to use `default` parameters choosen based on experiments.
+To extract mutational signatures with default parameters on an `Example` dataset run the following:
 
 `python ./MUSE-XAE/main.py --dataset Example`
 
@@ -65,16 +86,12 @@ The model gives also the possibility to select optional arguments:
 - `--n_jobs`: number of parallel jobs. Default is `24`.
 - `--cosmic_version`: Cosmic version reference. Default is `3.4` .
 
-
 ## Output
 
-Running MUSE-XAE will generate an `Experiments` folder with different subfolders.
-In `Plots` folder you can find signature plot (like the ones below) and in `Suggested_SBSB_DeNovo` you can find csv files for the extracted signatures and its relative exposures 
-and the match with COSMIC database.
+Running `MUSE-XAE` will generate an `Experiments` folder with different subfolders.
+In `Plots` folder you can find different kind of plot (like the two ones below).
 
 ![](Images/Plot_signature.png)
-
-
 
 
 ## References
