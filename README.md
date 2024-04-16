@@ -48,14 +48,14 @@ By default the reference set is the `COSMIC v3.4` SBS signatures. If you want to
 You need to be sure that your `Signatures_set` is in the `dataset` folder.
 We suggest to use the `default` parameters but you can also specifiy the following parameters:
 
--`--dataset`: **(Required)** Dataset name.
--`--refit_regularizer`: Refit Penalty type. Default is `l1`
--`--refit_penalty`: Refit Penalty amount. Default is `0.003`
--`--refit_loss`: Refit Loss function. Default is `mae`
--`--reference_set`: Signature Set to Refit. Default is `COSMIC_SBS_GRCh37_3.4`
--`--remove_artefact`: Remove known artefact. Default is `True`
--`--refit_patience`: Patience before stopping the refitting. Default is `200`
--`--n_jobs`: Number of cpu to use in parallel. Default is `12`
+- `--dataset`: **(Required)** Dataset name.
+- `--refit_regularizer`: Refit Penalty type. Default is `l1`
+- `--refit_penalty`: Refit Penalty amount. Default is `0.003`
+- `--refit_loss`: Refit Loss function. Default is `mae`
+- `--reference_set`: Signature Set to Refit. Default is `COSMIC_SBS_GRCh37_3.4`
+- `--remove_artefact`: Remove known artefact. Default is `True`
+- `--refit_patience`: Patience before stopping the refitting. Default is `200`
+- `--n_jobs`: Number of cpu to use in parallel. Default is `12`
 
 
 ## De-Novo Extraction of Mutational Signatures 
