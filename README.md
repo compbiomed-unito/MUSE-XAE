@@ -4,11 +4,6 @@
 
 MUSE-XAE is a user-friendly tool powered by the robust capabilities of autoencoder neural networks, allowing for the extraction and visualization of SBS mutational signatures present in a tumor catalog. MUSE-XAE consists of a hybrid denoising autoencoder with a nonlinear encoder that enables the learning of nonlinear interactions and a linear decoder that ensures interpretability. Based on the experiments, MUSE-XAE has proven to be one of the best performing and accurate tools in extracting mutational signatures. To delve deeper into its workings, please read the related paper
 
-## NEWS
-
-Stay tuned! In a few days MUSE-XAE refitting tool will be soon available !
-We are currently updating the current repo with a more complete and well written version of the tool.
-
 
 ## Instructions
 
@@ -42,7 +37,7 @@ All the synthetic datasets reported in this repo and used in the paper are taken
 
 For a quick test with the `Example` dataset run the following:
 
-`python ./MUSE-XAE/MUSE_XAE.py --dataset Example --iter 5  --min_sig 2 --max_sig 5` 
+`python ./MUSE-XAE/main.py --dataset Example --iter 5  --min_sig 2 --max_sig 5` 
 
 
 ## Complete Usage
