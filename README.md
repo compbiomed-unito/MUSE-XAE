@@ -93,18 +93,21 @@ Running `MUSE-XAE` will generate an `Experiments` (or a directory specified by t
 with subfolders.
 
 For the `MUSE-XAE De-Novo Extraction`  module in `Plots` folder
-you will find the extracted signatures profile (like the one below)
+you will find the extracted signatures profile
 
+### Mutational Signature profile
 ![](Images/Plot_signature.png)
 
 For both `MUSE-XAE De-Novo Extraction` and `MUSE-XAE De-Novo Refitting` you will also find
 the distribution of exposures in all samples and how each signatures contribute to mutations in each samples.
 
+### Signature contribution
 
-<p align="center">
-  <img src="Images/Exposures_Signatures.png" alt="Exposure Signature" width="48%">
-  <img src="Images/Exposures_distribution.png" alt="Exposure Distribution" width="48%">
-</p>
+![](Images/Images/Exposures_Signatures.png)
+
+### Exposures distribution
+
+![](Images/Exposures_distribution.png)
 
 
 
