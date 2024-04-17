@@ -103,7 +103,7 @@ the distribution of exposures in all samples and how each signatures contribute 
 
 ### Signature contribution
 
-![](Images/Images/Exposures_Signatures.png)
+![](Images/Exposures_Signatures.png)
 
 ### Exposures distribution
 
