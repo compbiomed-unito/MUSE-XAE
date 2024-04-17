@@ -102,8 +102,8 @@ the distribution of exposures in all samples and how each signatures contribute 
 
 
 <p align="center">
-  <img src="Images/Exposure_Signature.png" alt="Exposure Signature" width="48%">
-  <img src="Images/Exposure_distribution.png" alt="Exposure Distribution" width="48%">
+  <img src="Images/Exposures_Signatures.png" alt="Exposure Signature" width="48%">
+  <img src="Images/Exposures_distribution.png" alt="Exposure Distribution" width="48%">
 </p>
 
 
