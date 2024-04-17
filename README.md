@@ -2,7 +2,7 @@
 
 ![](Images/MUSE-XAE.png)
 
-MUSE-XAE is a user-friendly tool powered by the robust capabilities of autoencoder neural networks, allowing for the extraction and visualization of SBS mutational signatures present in a tumor catalog. MUSE-XAE consists of a hybrid denoising autoencoder with a nonlinear encoder that enables the learning of nonlinear interactions and a linear decoder that ensures interpretability. Based on the experiments, MUSE-XAE has proven to be one of the best performing and accurate tools in extracting mutational signatures. To delve deeper into its workings, please read the related paper
+MUSE-XAE is a user-friendly tool powered by the robust capabilities of autoencoder neural networks, allowing for the extraction and visualization of SBS mutational signatures present in a tumor catalog. MUSE-XAE consists of a hybrid denoising autoencoder with a nonlinear encoder that enables learning of nonlinear interactions and a linear decoder that ensures interpretability. Based on the experiments, MUSE-XAE has proven to be one of the best performing and accurate tools in extracting mutational signatures. To delve deeper into its workings, please read the related paper.
 
 
 ## Instructions
@@ -17,8 +17,8 @@ After downloading the repository we suggest to create a conda environment with p
 
 ## Availability
 
-MUSE-XAE is currently available through GitHub and the code runs only on CPU, 
-but it will soon be available as an installable Python package and will be able to run on GPU.
+MUSE-XAE is currently available through GitHub and the code runs only on CPUs, 
+but it will soon be available as an installable Python package and will be able to run on GPUs.
 
 MUSE-XAE is constituted by to main modules: `MUSE-XAE De-Novo Extraction` and `MUSE-XAE Refitting`
 
@@ -37,14 +37,15 @@ All the synthetic datasets reported in this repo and used in the paper are taken
 
 ## Refitting with known Mutational Signatures
 
-`MUSE-XAE Refitting` module perform a consensus refitting made by `10` repetition of MUSE-XAE refitting algorithm to increase robustness and
+`MUSE-XAE Refitting` module perform a consensus refitting made by `10` repetitions of MUSE-XAE refitting algorithm to increase robustness and
 reliability of assignment.
 
 To `Refit` COSMIC signatures to an `Example` dataset run the following:
 
 `python ./MUSE-XAE/main.py --dataset Example --refit_only True`
 
-By default the reference set is the `COSMIC v3.4` SBS signatures. If you want to add your own reference set add `--reference_set Signatures_set` to the previous line.
+By default the reference set is the `COSMIC v3.4` SBS signatures. If you want to add your own reference set use 
+`--reference_set Signatures_set` to the previous line.
 You need to be sure that your `Signatures_set` is in the `dataset` folder.
 We suggest to use the `default` parameters but you can also specifiy the following parameters:
 
@@ -63,12 +64,12 @@ We suggest to use the `default` parameters but you can also specifiy the followi
 `MUSE-XAE De-Novo Extraction` module perform De-Novo Extraction of mutational signatures and then uses `MUSE-XAE Refitting` module
 to assign mutations to the extracted signatures.
 
-We suggest to use `default` parameters choosen based on experiments.
-To extract mutational signatures with default parameters on an `Example` dataset run the following:
+For a quick test to extract mutational signatures with default parameters on an `Example` dataset run the following:
 
-`python ./MUSE-XAE/main.py --dataset Example`
+`python ./MUSE-XAE/main.py --dataset Example --min_sig 2 --max_sig 5 --iter 5 --augmentation 10`
 
-The model gives also the possibility to select optional arguments:
+For the standard usage we suggest to use `default` parameters choosen based on experiments.
+All the optional arguments are listed below:
 
 - `--dataset`: **(Required)** Dataset name.
 - `--augmentation`: Number of times of data augmentation. Default is `100`.
@@ -86,17 +87,30 @@ The model gives also the possibility to select optional arguments:
 - `--n_jobs`: number of parallel jobs. Default is `24`.
 - `--cosmic_version`: Cosmic version reference. Default is `3.4` .
 
-## Output
+## Output data
 
-Running `MUSE-XAE` will generate an `Experiments` folder with different subfolders.
-In `Plots` folder you can find different kind of plot (like the two ones below).
+Running `MUSE-XAE` will generate an `Experiments` (or a directory specified by the user) directory
+with subfolders.
+
+For the `MUSE-XAE De-Novo Extraction`  module in `Plots` folder
+you will find the extracted signatures profile (like the one below)
 
 ![](Images/Plot_signature.png)
+
+For both `MUSE-XAE De-Novo Extraction` and `MUSE-XAE De-Novo Refitting` you will also find
+the distribution of exposures in all samples and how each signatures contribute to mutations in each samples.
+
+
+<p align="center">
+  <img src="Images/Exposure_Signature.png" alt="Exposure Signature" width="48%">
+  <img src="Images/Exposure_distribution.png" alt="Exposure Distribution" width="48%">
+</p>
+
 
 
 ## References
 
 - Uncovering novel mutational signatures by de novo extraction with SigProfilerExtractor, Islam et al. [DOI](https://doi.org/10.1016/j.xgen.2022.100179)
-- The Cancer Genome Atlas Research Network., Weinstein, J., Collisson, E. et al. The Cancer Genome Atlas Pan-Cancer analysis project. Nat Genet 45, 1113â€“1120 (2013) [DOI](https://doi.org/10.1038/ng.2764)
+- The Cancer Genome Atlas Research Network., Weinstein, J., Collisson, E. et al. The Cancer Genome Atlas Pan-Cancer analysis project. Nat Genet 45, 1113–1120 (2013) [DOI](https://doi.org/10.1038/ng.2764)
 - Signal: The home page of mutational signatures. S. Shooter, J. Czarnecki, S. Nik-Zainal [DOI](https://doi.org/10.1038/ng.2764)
 
