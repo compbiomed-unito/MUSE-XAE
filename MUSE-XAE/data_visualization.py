@@ -170,7 +170,7 @@ def plot_exposures_dist(exposures,save_to):
     fig, ax = plt.subplots(figsize=(15, 8))  # Larghezza dinamica basata sul numero di colonne
 
     # Genera i box plot con colori diversi
-    bp = ax.boxplot(data_to_plot, patch_artist=True, vert=True, showfliers=False, positions=range(len(filtered_columns)))
+    bp = ax.boxplot(data_to_plot, patch_artist=True, vert=True, showfliers=True, positions=range(len(filtered_columns)))
 
     # Colora ogni box plot con un colore diverso
     colors = plt.cm.viridis(np.linspace(0, 1, len(filtered_columns)))

@@ -18,11 +18,9 @@ def signature_assignment(args):
 
 
         try:
-            S=pd.read_csv(f'../datasets/{args.reference_set}.csv').set_index('Type')
+            S=pd.read_csv(f'./datasets/{args.reference_set}.csv').set_index('Type')
         except:
-            S=pd.read_csv(f'../datasets/{args.reference_set}.txt',sep='\t').set_index('Type')
-
-        # FIX HERE ARTEFACTS SHOULD BE REMOVED BUT MAYBE SOMEONE USE A DIFFERENT SBS NOTATION.
+            S=pd.read_csv(f'./datasets/{args.reference_set}.txt',sep='\t').set_index('Type')
 
 
         if args.remove_artefact=='True':
@@ -39,7 +37,7 @@ def signature_assignment(args):
                 S=S[S.columns.drop(artefact_3_3)]
 
 
-        Main_dir=f'../Experiments/{args.directory}/{args.dataset}/Refit'
+        Main_dir=f'./Experiments/{args.directory}/{args.dataset}/Refit'
         os.makedirs(Main_dir,exist_ok=True)
         
         Models_dir=f'{Main_dir}/Models/'
