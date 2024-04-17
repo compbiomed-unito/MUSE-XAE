@@ -184,11 +184,11 @@ def plot_exposures_dist(exposures,save_to):
     # Usa le frazioni come etichette sull'asse x
     for i, col in enumerate(filtered_columns):
         label = fr"$\frac{{{non_zero_counts[col]}}}{{{total_samples}}}$"
-        ax.text(i, -0.02, label, ha='center', va='top', transform=ax.get_xaxis_transform(), rotation=0, fontsize=12)
+        ax.text(i, -0.02, label, ha='center', va='top', transform=ax.get_xaxis_transform(), rotation=0, fontsize=15)
 
     # Aggiungi le etichette delle signature sopra i box plot
     for i, col in enumerate(filtered_columns):
-        ax.text(i, ax.get_ylim()[1], col, ha='center', va='bottom', rotation=45, fontsize=8)
+        ax.text(i, ax.get_ylim()[1], col, ha='center', va='bottom', rotation=45, fontsize=12)
 
     # Imposta i titoli degli assi
     ax.set_xlabel('')
@@ -217,10 +217,10 @@ def plot_results(data,S,E,sig_index,tumour_types,save_to,cosmic_version):
 
     if cosmic_version=='3.4':
         
-        COSMIC_sig=pd.read_csv('../datasets/COSMIC_SBS_GRCh37_3.4.txt',sep='\t').set_index('Type')
+        COSMIC_sig=pd.read_csv('./datasets/COSMIC_SBS_GRCh37_3.4.txt',sep='\t').set_index('Type')
  
     else:
-        COSMIC_sig=pd.read_csv('../datasets/COSMIC_SBS_GRCh37.txt',sep='\t').set_index('Type')
+        COSMIC_sig=pd.read_csv('./datasets/COSMIC_SBS_GRCh37.txt',sep='\t').set_index('Type')
     
     cost=pd.DataFrame(cosine_similarity(S.T,COSMIC_sig.T))
     row_ind,col_ind=linear_sum_assignment(1-cost)

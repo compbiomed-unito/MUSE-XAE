@@ -28,7 +28,7 @@ class KMeans_with_matching:
         self.n = X.shape[0]
 
         if self.n_clusters > 1:
-            model = KMeans(n_clusters=n_clusters, init='random').fit(self.X)
+            model = KMeans(n_clusters=n_clusters, init='random',n_init=10).fit(self.X)
             self.C = np.asarray(model.cluster_centers_)
         else:
             self.C = self.X[np.random.choice(self.n, size=1), :]
