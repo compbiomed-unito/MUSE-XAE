@@ -20,7 +20,7 @@ After downloading the repository we suggest to create a conda environment with p
 MUSE-XAE is currently available through GitHub and the code runs only on CPUs, 
 but it will soon be available as an installable Python package and will be able to run on GPUs.
 
-MUSE-XAE is constituted by to main modules: `MUSE-XAE De-Novo Extraction` and `MUSE-XAE Refitting`
+MUSE-XAE is constituted by two main modules: `MUSE-XAE De-Novo Extraction` and `MUSE-XAE Refitting`
 
 
 ## Input Data 
@@ -114,6 +114,6 @@ the distribution of exposures in all samples and how each signatures contribute 
 ## References
 
 - Uncovering novel mutational signatures by de novo extraction with SigProfilerExtractor, Islam et al. [DOI](https://doi.org/10.1016/j.xgen.2022.100179)
-- The Cancer Genome Atlas Research Network., Weinstein, J., Collisson, E. et al. The Cancer Genome Atlas Pan-Cancer analysis project. Nat Genet 45, 1113–1120 (2013) [DOI](https://doi.org/10.1038/ng.2764)
+- The Cancer Genome Atlas Research Network., Weinstein, J., Collisson, E. et al. The Cancer Genome Atlas Pan-Cancer analysis project. Nat Genet 45, 1113â€“1120 (2013) [DOI](https://doi.org/10.1038/ng.2764)
 - Signal: The home page of mutational signatures. S. Shooter, J. Czarnecki, S. Nik-Zainal [DOI](https://doi.org/10.1038/ng.2764)
 
