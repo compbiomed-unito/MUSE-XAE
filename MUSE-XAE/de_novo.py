@@ -31,12 +31,12 @@ def denovo_extraction(args):
     refit_only,reference_set,refit_patience,refit_penalty=args.refit_only,args.reference_set,args.refit_patience,args.refit_penalty
     remove_artefact,refit_regularizer,refit_loss=args.remove_artefact,args.refit_regularizer,args.refit_loss
 
-    if args.run :
+    if args.run > 1 :
         iteration=args.run
-        Main_dir=f'./Experiments/{directory}/{data}/Run_{iteration}'
+        Main_dir=f'./Experiments/{directory}/{data}/De-Novo/Run_{iteration}'
         os.makedirs(Main_dir,exist_ok=True)
     else:
-        Main_dir=f'./Experiments/{directory}/{data}'
+        Main_dir=f'./Experiments/{directory}/{data}/De-Novo/'
         os.makedirs(Main_dir,exist_ok=True)
 
     Models_dir=f'{Main_dir}/Models/'

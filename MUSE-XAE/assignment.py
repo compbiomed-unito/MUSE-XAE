@@ -1,10 +1,11 @@
 import pandas as pd
 import os
-from general_utils import refit,consensus_refit
+from general_utils import refit,consensus_refit,refit_process
 from data_preprocessing import load_dataset
 from data_visualization import plot_exposures,plot_exposures_dist
 import tensorflow.python.util.deprecation as deprecation
 import tensorflow as tf
+import multiprocessing
 
 
 def signature_assignment(args):
@@ -51,13 +52,16 @@ def signature_assignment(args):
         
         X=load_dataset(name=args.dataset,cosmic_version=args.cosmic_version)
         
-        exposures=[]
-        for n in range(5):
-            E=refit(X,S=S,best=S.shape[1],save_to=Models_dir,refit_patience=args.refit_patience,
-                refit_penalty=args.refit_penalty,refit_regularizer=args.refit_regularizer,refit_loss=args.refit_loss)
-            E=E.reset_index(drop=True)
-
-            exposures.append(E)
+        # exposures=[]
+        # for n in range(5):
+        #     E=refit(X,S=S,best=S.shape[1],save_to=Models_dir,refit_patience=args.refit_patience,
+        #         refit_penalty=args.refit_penalty,refit_regularizer=args.refit_regularizer,refit_loss=args.refit_loss)
+        #     E=E.reset_index(drop=True)
+        #    exposures.append(E)
+        
+        with multiprocessing.Pool(5) as pool:
+            args_list = [(X, S, Models_dir, args.refit_patience, args.refit_penalty, args.refit_regularizer, args.refit_loss, r) for r in range(5)]
+            exposures = pool.starmap(refit_process, args_list)
         
         consensus_exposures=consensus_refit(exposures)
         

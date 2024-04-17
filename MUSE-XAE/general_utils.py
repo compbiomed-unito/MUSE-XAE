@@ -101,7 +101,7 @@ def optimal_cosine_similarity(all_extractions, min_sig=2,max_sig=15):
     return min_cosine, mean_cosine,signatures,silhouettes
  
 
-def refit(data,S,best,save_to='./',refit_patience=100,refit_penalty=1e-3,refit_regularizer='l1',refit_loss='mae'):
+def refit(data,S,best,save_to='./',refit_patience=100,refit_penalty=1e-3,refit_regularizer='l1',refit_loss='mae',run=1):
      
     original_data=np.array(data)
     X=normalize(data)
@@ -112,11 +112,11 @@ def refit(data,S,best,save_to='./',refit_patience=100,refit_penalty=1e-3,refit_r
     model.layers[-1].trainable=False 
 
     early_stopping=EarlyStopping(monitor='val_mse',patience=refit_patience)
-    checkpoint=ModelCheckpoint(f'{save_to}best_model_refit.h5', monitor='val_mse', save_best_only=True, verbose=False)
+    checkpoint=ModelCheckpoint(f'{save_to}best_model_refit_{run}.h5', monitor='val_mse', save_best_only=True, verbose=False)
     model.compile(optimizer=Adam(learning_rate=0.0005),loss=refit_loss,metrics=['mse','kullback_leibler_divergence'])
     history=model.fit(X,X,epochs=10000,batch_size=128,verbose=False,validation_data=(X,X),callbacks=[early_stopping,checkpoint])
       
-    model_new=load_model(f'{save_to}best_model_refit.h5',custom_objects={"minimum_volume":minimum_volume(beta=0.001,dim=int(len(S.T)))})
+    model_new=load_model(f'{save_to}best_model_refit_{run}.h5',custom_objects={"minimum_volume":minimum_volume(beta=0.001,dim=int(len(S.T)))})
     encoder_new = Model(inputs=model_new.input, outputs=model_new.get_layer('encoder_layer').output)    
     E=pd.DataFrame(encoder_new.predict(X))
 
@@ -131,6 +131,11 @@ def refit(data,S,best,save_to='./',refit_patience=100,refit_penalty=1e-3,refit_r
 
     return E
 
+def refit_process(X,S,Models_dir,refit_patience,refit_penalty,refit_regularizer,refit_loss,run):
+    E = refit(X, S=S, best=S.shape[1], save_to=Models_dir, refit_patience=refit_patience,
+            refit_penalty=refit_penalty, refit_regularizer=refit_regularizer, refit_loss=refit_loss,run=run)
+    E = E.reset_index(drop=True)
+    return E
 
 def consensus_refit(exposures, n_runs=5):
 
