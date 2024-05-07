@@ -80,11 +80,9 @@ class minimum_volume(tf.keras.constraints.Constraint):
         log_det = K.log(det) / K.log(10.0)
         return self.beta * log_det
     
-    # Metodo per ottenere la configurazione della constraint
     def get_config(self):
         return {'dim': self.dim, 'beta': self.beta}
 
-    # Metodo statico per creare una constraint a partire dalla sua configurazione
     @staticmethod
     def from_config(config):
         return minimum_volume(**config)
@@ -103,11 +101,11 @@ def MUSE_XAE(input_dim=96,l_1=128,z=17,beta=0.001,activation='softplus',reg='min
 
     encoder_input=Input(shape=(input_dim,))
     
-    latent_1 = Dense(l_1,activation='elu')(encoder_input)
+    latent_1 = Dense(l_1,activation='relu')(encoder_input)
     latent_1 = BatchNormalization()(latent_1)
-    latent_1 = Dense(l_1/2,activation='elu')(latent_1)
+    latent_1 = Dense(l_1/2,activation='relu')(latent_1)
     latent_1 = BatchNormalization()(latent_1)
-    latent_1 = Dense(l_1/4,activation='elu')(latent_1)
+    latent_1 = Dense(l_1/4,activation='relu')(latent_1)
     latent_1 = BatchNormalization()(latent_1)
 
     if refit==True: 
