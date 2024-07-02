@@ -35,29 +35,6 @@ In the following image we show the first five rows of the example dataset for si
 
 All the synthetic datasets reported in this repo and used in the paper are taken from `Uncovering novel mutational signatures by de novo extraction with SigProfilerExtractor` from Islam et al. [[1]](https://doi.org/10.1016/j.xgen.2022.100179). Links are provided in the reproducibility notebook inside the notebook folder. 
 
-## Refitting with known Mutational Signatures
-
-`MUSE-XAE Refitting` module perform a consensus refitting made by `10` repetitions of MUSE-XAE refitting algorithm to increase robustness and
-reliability of assignment.
-
-To `Refit` COSMIC signatures to an `Example` dataset run the following:
-
-`python ./MUSE-XAE/main.py --dataset Example --refit_only True`
-
-By default the reference set is the `COSMIC v3.4` SBS signatures. If you want to add your own reference set use 
-`--reference_set Signatures_set` to the previous line.
-You need to be sure that your `Signatures_set` is in the `dataset` folder.
-We suggest to use the `default` parameters but you can also specifiy the following parameters:
-
-- `--dataset`: **(Required)** Dataset name.
-- `--refit_regularizer`: Refit Penalty type. Default is `l1`
-- `--refit_penalty`: Refit Penalty amount. Default is `0.003`
-- `--refit_loss`: Refit Loss function. Default is `mae`
-- `--reference_set`: Signature Set to Refit. Default is `COSMIC_SBS_GRCh37_3.4`
-- `--remove_artefact`: Remove known artefact. Default is `True`
-- `--refit_patience`: Patience before stopping the refitting. Default is `200`
-- `--n_jobs`: Number of cpu to use in parallel. Default is `12`
-
 
 ## De-Novo Extraction of Mutational Signatures 
 
@@ -86,6 +63,29 @@ All the optional arguments are listed below:
 - `--activation`: Activation function. Default is `softplus`.
 - `--n_jobs`: number of parallel jobs. Default is `24`.
 - `--cosmic_version`: Cosmic version reference. Default is `3.4` .
+
+## Refitting with known Mutational Signatures
+
+`MUSE-XAE Refitting` module (Beta version) perform a consensus refitting made by `10` repetitions of MUSE-XAE refitting algorithm to increase robustness and
+reliability of assignment.
+
+To `Refit` COSMIC signatures to an `Example` dataset run the following:
+
+`python ./MUSE-XAE/main.py --dataset Example --refit_only True`
+
+By default the reference set is the `COSMIC v3.4` SBS signatures. If you want to add your own reference set use 
+`--reference_set Signatures_set` to the previous line.
+You need to be sure that your `Signatures_set` is in the `dataset` folder.
+We suggest to use the `default` parameters but you can also specifiy the following parameters:
+
+- `--dataset`: **(Required)** Dataset name.
+- `--refit_regularizer`: Refit Penalty type. Default is `l1`
+- `--refit_penalty`: Refit Penalty amount. Default is `0.003`
+- `--refit_loss`: Refit Loss function. Default is `mae`
+- `--reference_set`: Signature Set to Refit. Default is `COSMIC_SBS_GRCh37_3.4`
+- `--remove_artefact`: Remove known artefact. Default is `True`
+- `--refit_patience`: Patience before stopping the refitting. Default is `200`
+- `--n_jobs`: Number of cpu to use in parallel. Default is `12`
 
 ## Output data
 
