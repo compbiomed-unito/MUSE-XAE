@@ -21,7 +21,7 @@ def parser_args():
     parser.add_argument('--refit_only', type=str, help='Refit only a reference signatures set',required=False,default="False")
     parser.add_argument('--refit_patience', type=int,required=False,default=200)
     parser.add_argument('--refit_regularizer', type=str,required=False,default='l1')
-    parser.add_argument('--refit_penalty', type=float,required=False,default=0.003)
+    parser.add_argument('--refit_penalty', type=float,required=False,default=0.001)
     parser.add_argument('--refit_loss', type=str, default='mae', help='Refit Loss function to use in the autoencoder')
     parser.add_argument('--reference_set',type=str,default='COSMIC_SBS_GRCh37_3.4',required=False)
     parser.add_argument('--remove_artefact',type=str,required=False,default="True")
