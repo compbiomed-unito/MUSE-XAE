@@ -5,11 +5,14 @@ import sklearn
 import tensorflow as tf
 import os
 from tensorflow.keras import backend as K
+from tensorflow.keras.losses import mse,MAE
 from tensorflow.keras.models import load_model,Model
 from tensorflow.keras.callbacks import EarlyStopping,ModelCheckpoint
 from models import MUSE_XAE,KMeans_with_matching,minimum_volume
 from data_preprocessing import normalize,data_augmentation
 from tensorflow.keras.optimizers.legacy import Adam
+from sklearn.metrics.pairwise import cosine_similarity
+
 
 
 
@@ -101,43 +104,116 @@ def optimal_cosine_similarity(all_extractions, min_sig=2,max_sig=15):
     return min_cosine, mean_cosine,signatures,silhouettes
  
 
-def refit(data,S,best,save_to='./',refit_patience=100,refit_penalty=1e-3,refit_regularizer='l1',refit_loss='mae',run=1):
+
+def refit(data,S,best,save_to='./',refit_patience=100,refit_penalty=1e-3,refit_regularizer='l1',refit_loss='mae',batch_size=64,run=1):
      
     original_data=np.array(data)
+    sample_sum=original_data.sum(axis=1)
+
     X=normalize(data)
+    X_noise=normalize(data_augmentation(X=np.array(data), augmentation=1))
+
     model,encoder_model = MUSE_XAE(input_dim=96,z=int(best),refit=True,
                                    refit_penalty=refit_penalty,refit_regularizer=refit_regularizer)
+
+
+    
     S=S.apply(lambda x : x/sum(x))
     model.layers[-1].set_weights([np.array(S.T)])
     model.layers[-1].trainable=False 
 
     early_stopping=EarlyStopping(monitor='val_mse',patience=refit_patience)
     checkpoint=ModelCheckpoint(f'{save_to}best_model_refit_{run}.h5', monitor='val_mse', save_best_only=True, verbose=False)
-    model.compile(optimizer=Adam(learning_rate=0.0005),loss=refit_loss,metrics=['mse','kullback_leibler_divergence'])
-    history=model.fit(X,X,epochs=10000,batch_size=128,verbose=False,validation_data=(X,X),callbacks=[early_stopping,checkpoint])
-      
-    model_new=load_model(f'{save_to}best_model_refit_{run}.h5',custom_objects={"minimum_volume":minimum_volume(beta=0.001,dim=int(len(S.T)))})
-    encoder_new = Model(inputs=model_new.input, outputs=model_new.get_layer('encoder_layer').output)    
-    E=pd.DataFrame(encoder_new.predict(X))
 
-    sample_sum=original_data.sum(axis=1)
-    d=E.apply(lambda x:x/sum(x)+1e-15,axis=1).reset_index(drop=True)
-    d[d<0.05]=0
-    d=d.apply(lambda x:x/sum(x)+1e-15,axis=1).reset_index(drop=True)
-    E=d.mul(list(sample_sum),axis=0)
+    model.compile(optimizer=Adam(learning_rate=0.001),loss=refit_loss,metrics=['mse','kullback_leibler_divergence'])
+    history=model.fit(X_noise,X,epochs=10000,batch_size=batch_size,verbose=False,validation_data=(X,X),callbacks=[early_stopping,checkpoint])
+    model_new=load_model(f'{save_to}best_model_refit_{run}.h5',custom_objects={"minimum_volume":minimum_volume(beta=0.001,dim=int(len(S.T)))})
+
+    encoder_new = Model(inputs=model_new.input, outputs=model_new.get_layer('encoder_layer').output)    
+    
+    # extract prediction
+
+    exp_t=pd.DataFrame(encoder_new.predict(X))
+    exp_t=process_signatures(exp_t.reset_index(drop=True),S.T.reset_index(drop=True),pd.DataFrame(original_data))
+    exp_t=exp_t.apply(lambda x:x/sum(x),axis=1).reset_index(drop=True)
+    
+    E=exp_t.mul(list(sample_sum),axis=0)
     E.columns=S.T.index
     E=E.round()
     E.fillna(0,inplace=True)
 
     return E
 
-def refit_process(X,S,Models_dir,refit_patience,refit_penalty,refit_regularizer,refit_loss,run):
+
+def calculate_cosine_similarity(vec1, vec2):
+    return cosine_similarity(vec1.reshape(1, -1), vec2.reshape(1, -1))[0][0]
+
+
+def process_signatures(exp, cosmic_sig, real_samples):
+    results = {}
+    for index, row in exp.iterrows():
+        total_contribution_real = real_samples.loc[index].sum()
+        total_contribution = row.sum()
+        
+        to_remove = [sig for sig in exp.columns if (row[sig] / total_contribution) < 0.0001]
+        to_test = [sig for sig in exp.columns if 0.0001 <= (row[sig] / total_contribution) <= 0.05]
+
+        row[to_remove] = 0
+        
+        initial_exp_sample = row.copy()
+        initial_exp_sample[to_test] = 0
+
+        norm_initial_exp_sample = initial_exp_sample / total_contribution
+        norm_initial_exp_sample = norm_initial_exp_sample * total_contribution_real
+
+        initial_pred_sample = norm_initial_exp_sample.dot(cosmic_sig)
+        
+        real_sample = real_samples.loc[index]
+
+        initial_cosine_similarity = calculate_cosine_similarity(initial_pred_sample.values, real_sample.values)
+        
+        while to_test:
+            cosine_similarities = []
+
+            for sig in to_test:
+                test_exp_sample = initial_exp_sample.copy()
+                test_exp_sample[sig] = row[sig]
+
+                norm_test_exp_sample=test_exp_sample / test_exp_sample.sum()
+                norm_test_exp_sample=norm_test_exp_sample * total_contribution_real
+
+                test_pred_sample=norm_test_exp_sample.dot(cosmic_sig)
+
+                cos_sim = calculate_cosine_similarity(test_pred_sample.values, real_sample.values)
+                cosine_similarities.append((sig, cos_sim))
+            
+            cosine_similarities.sort(key=lambda x: x[1], reverse=True)
+            
+            best_sig, best_cos_sim = cosine_similarities[0]
+
+
+            if best_cos_sim > initial_cosine_similarity:
+
+                initial_exp_sample[best_sig] = row[best_sig]
+                initial_cosine_similarity = best_cos_sim
+                
+                to_test.remove(best_sig)
+            else:
+                break
+        
+        results[index] = initial_exp_sample
+
+    return pd.DataFrame(results).T
+
+
+def refit_process(X,S,Models_dir,refit_patience,refit_penalty,refit_regularizer,refit_loss,batch_size,run):
     E = refit(X, S=S, best=S.shape[1], save_to=Models_dir, refit_patience=refit_patience,
-            refit_penalty=refit_penalty, refit_regularizer=refit_regularizer, refit_loss=refit_loss,run=run)
+            refit_penalty=refit_penalty, refit_regularizer=refit_regularizer, refit_loss=refit_loss,batch_size=batch_size,run=run)
     E = E.reset_index(drop=True)
     return E
 
-def consensus_refit(exposures, n_runs=5):
+
+def consensus_refit(exposures):
 
     print(' ')
     print('--------------------------------------------------')
