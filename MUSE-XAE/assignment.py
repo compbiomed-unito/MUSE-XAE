@@ -52,15 +52,9 @@ def signature_assignment(args):
         
         X=load_dataset(name=args.dataset,cosmic_version=args.cosmic_version)
         
-        # exposures=[]
-        # for n in range(5):
-        #     E=refit(X,S=S,best=S.shape[1],save_to=Models_dir,refit_patience=args.refit_patience,
-        #         refit_penalty=args.refit_penalty,refit_regularizer=args.refit_regularizer,refit_loss=args.refit_loss)
-        #     E=E.reset_index(drop=True)
-        #    exposures.append(E)
         
-        with multiprocessing.Pool(5) as pool:
-            args_list = [(X, S, Models_dir, args.refit_patience, args.refit_penalty, args.refit_regularizer, args.refit_loss, r) for r in range(5)]
+        with multiprocessing.Pool(10) as pool:
+            args_list = [(X, S, Models_dir, args.refit_patience, args.refit_penalty, args.refit_regularizer, args.refit_loss, args.batch_size, r) for r in range(10)]
             exposures = pool.starmap(refit_process, args_list)
         
         consensus_exposures=consensus_refit(exposures)
@@ -79,3 +73,8 @@ def signature_assignment(args):
 
         plot_exposures(consensus_exposures,save_to=Plot_dir)
         plot_exposures_dist(consensus_exposures,save_to=Plot_dir)
+
+
+        print(' ')
+        print('Thank you for using MUSE-XAE! Check the results on the Experiments folder')
+        print(' ')
