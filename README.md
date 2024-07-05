@@ -80,7 +80,7 @@ We suggest to use the `default` parameters but you can also specifiy the followi
 
 - `--dataset`: **(Required)** Dataset name.
 - `--refit_regularizer`: Refit Penalty type. Default is `l1`
-- `--refit_penalty`: Refit Penalty amount. Default is `0.003`
+- `--refit_penalty`: Refit Penalty amount. Default is `0.001`
 - `--refit_loss`: Refit Loss function. Default is `mae`
 - `--reference_set`: Signature Set to Refit. Default is `COSMIC_SBS_GRCh37_3.4`
 - `--remove_artefact`: Remove known artefact. Default is `True`
