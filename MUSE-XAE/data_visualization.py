@@ -118,84 +118,69 @@ def plot_exposures(exposures,save_to):
 
     max_samples_per_plot = 60
 
-    # Calcola il numero totale di pagine necessarie
     total_samples = exposures.shape[0]
     total_pages = np.ceil(total_samples / max_samples_per_plot).astype(int)
 
-    # Crea un PDF per salvare i plot
     with PdfPages(f'{save_to}/Exposures_Signature.pdf') as pdf:
         for page in range(total_pages):
-            # Seleziona un sottoinsieme di samples per l'attuale pagina
             start_idx = page * max_samples_per_plot
             end_idx = min((page + 1) * max_samples_per_plot, total_samples)
             subset = exposures.iloc[start_idx:end_idx]
             
-            # Identifica le signature presenti (non zero) in questo subset
             non_zero_columns = subset.columns[(subset != 0).any(axis=0)]
             
-            # Crea il plot
             fig, ax = plt.subplots(figsize=(12, 8))
             subset[non_zero_columns].plot(kind='bar', stacked=True, ax=ax)
             
-            # Imposta i titoli e le etichette
             plt.xlabel('Samples')
             plt.ylabel('Number of SBS mutations')
         
-            # Posiziona la legenda all'esterno del plot
             plt.legend(title='Signature', bbox_to_anchor=(1.05, 1), loc='upper left')
             
-            # Ajusta il layout e salva la pagina corrente nel PDF
-            plt.tight_layout(rect=[0,0,0.85,1])  # Ajusta lo spazio per la legenda
+            plt.tight_layout(rect=[0,0,0.85,1]) 
             pdf.savefig(fig)
             plt.close(fig)
+
 
 def plot_exposures_dist(exposures,save_to):
 
     data=exposures.copy()
 
-    # Calcola il numero di samples non-zero per ogni signature
     non_zero_counts = (data != 0).sum()
 
-    # Il numero totale di samples
     total_samples = data.shape[0]
 
-    # Filtra le colonne (signatures) che sono presenti in almeno un sample
     filtered_columns = non_zero_counts[non_zero_counts > 0].index
     filtered_data = data[filtered_columns]
 
-    # Prepara i dati per il box plot, considerando solo le signatures filtrate
-    data_to_plot = [filtered_data[col] for col in filtered_columns]
+    data_to_plot = [filtered_data[col][filtered_data[col]>0] for col in filtered_columns]
 
     # Crea il plot
-    fig, ax = plt.subplots(figsize=(15, 8))  # Larghezza dinamica basata sul numero di colonne
+    fig, ax = plt.subplots(figsize=(15, 8)) 
 
-    # Genera i box plot con colori diversi
     bp = ax.boxplot(data_to_plot, patch_artist=True, vert=True, showfliers=True, positions=range(len(filtered_columns)))
 
-    # Colora ogni box plot con un colore diverso
     colors = plt.cm.viridis(np.linspace(0, 1, len(filtered_columns)))
     for patch, color in zip(bp['boxes'], colors):
         patch.set_facecolor(color)
 
-    # Imposta le etichette sull'asse x come vuote per rimuovere i numeri predefiniti
     ax.set_xticks(range(len(filtered_columns)))
-    ax.set_xticklabels([''] * len(filtered_columns))  # Rimuove le etichette numeriche
+    ax.set_xticklabels([''] * len(filtered_columns))  
 
-    # Usa le frazioni come etichette sull'asse x
     for i, col in enumerate(filtered_columns):
         label = fr"$\frac{{{non_zero_counts[col]}}}{{{total_samples}}}$"
         ax.text(i, -0.02, label, ha='center', va='top', transform=ax.get_xaxis_transform(), rotation=0, fontsize=15)
 
-    # Aggiungi le etichette delle signature sopra i box plot
     for i, col in enumerate(filtered_columns):
-        ax.text(i, ax.get_ylim()[1], col, ha='center', va='bottom', rotation=45, fontsize=12)
+        ax.text(i, ax.get_ylim()[1]*2, col, ha='center', va='bottom', rotation=45, fontsize=14)
 
-    # Imposta i titoli degli assi
     ax.set_xlabel('')
     ax.set_ylabel('Number of SBS mutations')
+    ax.set_yscale('log')
 
     plt.tight_layout()
     plt.savefig(f'{save_to}Exposures_distribution.pdf',bbox_inches='tight')
+
 
 
 def plot_results(data,S,E,sig_index,tumour_types,save_to,cosmic_version):
@@ -216,7 +201,6 @@ def plot_results(data,S,E,sig_index,tumour_types,save_to,cosmic_version):
     E.to_csv(f'{Extraction_dir}MUSE_EXP.csv')
 
     if cosmic_version=='3.4':
-        
         COSMIC_sig=pd.read_csv('./datasets/COSMIC_SBS_GRCh37_3.4.txt',sep='\t').set_index('Type')
  
     else:
