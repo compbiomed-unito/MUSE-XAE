@@ -66,7 +66,7 @@ All the optional arguments are listed below:
 
 ## Refitting with known Mutational Signatures
 
-`MUSE-XAE Refitting` module (Beta version) perform a consensus refitting made by `10` repetitions of MUSE-XAE refitting algorithm to increase robustness and
+`MUSE-XAE Refitting` module perform a consensus refitting made by `10` repetitions of MUSE-XAE refitting algorithm to increase robustness and
 reliability of assignment.
 
 To `Refit` COSMIC signatures to an `Example` dataset run the following:
