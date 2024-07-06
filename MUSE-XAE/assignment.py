@@ -57,7 +57,7 @@ def signature_assignment(args):
             args_list = [(X, S, Models_dir, args.refit_patience, args.refit_penalty, args.refit_regularizer, args.refit_loss, args.batch_size, r) for r in range(10)]
             exposures = pool.starmap(refit_process, args_list)
         
-        consensus_exposures=consensus_refit(exposures)
+        consensus_exposures=consensus_refit(exposures,X)
         
 
         try:
