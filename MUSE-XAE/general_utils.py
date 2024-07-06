@@ -5,7 +5,7 @@ import sklearn
 import tensorflow as tf
 import os
 from tensorflow.keras import backend as K
-from tensorflow.keras.losses import mse,MAE
+from tensorflow.keras.losses import mse
 from tensorflow.keras.models import load_model,Model
 from tensorflow.keras.callbacks import EarlyStopping,ModelCheckpoint
 from models import MUSE_XAE,KMeans_with_matching,minimum_volume
@@ -117,7 +117,6 @@ def refit(data,S,best,save_to='./',refit_patience=100,refit_penalty=1e-3,refit_r
                                    refit_penalty=refit_penalty,refit_regularizer=refit_regularizer)
 
 
-    
     S=S.apply(lambda x : x/sum(x))
     model.layers[-1].set_weights([np.array(S.T)])
     model.layers[-1].trainable=False 
@@ -137,10 +136,14 @@ def refit(data,S,best,save_to='./',refit_patience=100,refit_penalty=1e-3,refit_r
     exp_t=process_signatures(exp_t.reset_index(drop=True),S.T.reset_index(drop=True),pd.DataFrame(original_data))
     exp_t=exp_t.apply(lambda x:x/sum(x),axis=1).reset_index(drop=True)
     
+
     E=exp_t.mul(list(sample_sum),axis=0)
     E.columns=S.T.index
-    E=E.round()
+    
+    E.to_csv(f'{save_to}exp_pre_round.csv')
+    E=E.round() 
     E.fillna(0,inplace=True)
+    E.to_csv(f'{save_to}exp_post_round.csv')
 
     return E
 
@@ -148,13 +151,15 @@ def refit(data,S,best,save_to='./',refit_patience=100,refit_penalty=1e-3,refit_r
 def calculate_cosine_similarity(vec1, vec2):
     return cosine_similarity(vec1.reshape(1, -1), vec2.reshape(1, -1))[0][0]
 
+def calculate_l2_norm(vec1, vec2):
+    return np.linalg.norm(vec1 - vec2)
 
 def process_signatures(exp, cosmic_sig, real_samples):
     results = {}
     for index, row in exp.iterrows():
         total_contribution_real = real_samples.loc[index].sum()
         total_contribution = row.sum()
-        
+
         to_remove = [sig for sig in exp.columns if (row[sig] / total_contribution) < 0.0001]
         to_test = [sig for sig in exp.columns if 0.0001 <= (row[sig] / total_contribution) <= 0.05]
 
@@ -171,32 +176,34 @@ def process_signatures(exp, cosmic_sig, real_samples):
         real_sample = real_samples.loc[index]
 
         initial_cosine_similarity = calculate_cosine_similarity(initial_pred_sample.values, real_sample.values)
-        
+        initial_l2_error = calculate_l2_norm(initial_pred_sample.values, real_sample.values)
+
         while to_test:
-            cosine_similarities = []
+            similarities_and_errors = []
 
             for sig in to_test:
                 test_exp_sample = initial_exp_sample.copy()
                 test_exp_sample[sig] = row[sig]
 
-                norm_test_exp_sample=test_exp_sample / test_exp_sample.sum()
-                norm_test_exp_sample=norm_test_exp_sample * total_contribution_real
+                norm_test_exp_sample = test_exp_sample / test_exp_sample.sum()
+                norm_test_exp_sample = norm_test_exp_sample * total_contribution_real
 
-                test_pred_sample=norm_test_exp_sample.dot(cosmic_sig)
+                test_pred_sample = norm_test_exp_sample.dot(cosmic_sig)
 
                 cos_sim = calculate_cosine_similarity(test_pred_sample.values, real_sample.values)
-                cosine_similarities.append((sig, cos_sim))
+                l2_error = calculate_l2_norm(test_pred_sample.values, real_sample.values)
+                similarities_and_errors.append((sig, cos_sim, l2_error))
             
-            cosine_similarities.sort(key=lambda x: x[1], reverse=True)
+            similarities_and_errors.sort(key=lambda x: x[1], reverse=True)
             
-            best_sig, best_cos_sim = cosine_similarities[0]
+            best_sig, best_cos_sim, best_l2_error = similarities_and_errors[0]
 
+            relative_l2_error_improvement = (initial_l2_error - best_l2_error) / initial_l2_error
 
-            if best_cos_sim > initial_cosine_similarity:
-
+            if best_cos_sim > initial_cosine_similarity and relative_l2_error_improvement >= 0.01:
                 initial_exp_sample[best_sig] = row[best_sig]
                 initial_cosine_similarity = best_cos_sim
-                
+                initial_l2_error = best_l2_error
                 to_test.remove(best_sig)
             else:
                 break
@@ -205,7 +212,6 @@ def process_signatures(exp, cosmic_sig, real_samples):
 
     return pd.DataFrame(results).T
 
-
 def refit_process(X,S,Models_dir,refit_patience,refit_penalty,refit_regularizer,refit_loss,batch_size,run):
     E = refit(X, S=S, best=S.shape[1], save_to=Models_dir, refit_patience=refit_patience,
             refit_penalty=refit_penalty, refit_regularizer=refit_regularizer, refit_loss=refit_loss,batch_size=batch_size,run=run)
@@ -213,7 +219,7 @@ def refit_process(X,S,Models_dir,refit_patience,refit_penalty,refit_regularizer,
     return E
 
 
-def consensus_refit(exposures):
+def consensus_refit(exposures,X):
 
     print(' ')
     print('--------------------------------------------------')
@@ -239,6 +245,12 @@ def consensus_refit(exposures):
                 if values:consensus_matrix.at[index, col] = np.median(values)
                 else: consensus_matrix.at[index, col] = 0 
             else: consensus_matrix.at[index, col] = 0  
+    
+    sample_sum=X.sum(axis=1)
+    consensus_matrix=consensus_matrix.apply(lambda x:x/sum(x),axis=1).reset_index(drop=True)
+    consensus_matrix=consensus_matrix.mul(list(sample_sum),axis=0)
+    consensus_matrix=consensus_matrix.round() 
+    consensus_matrix.fillna(0,inplace=True)
 
     return consensus_matrix
 
