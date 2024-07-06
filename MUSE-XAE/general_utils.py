@@ -156,15 +156,15 @@ def process_signatures(exp, cosmic_sig, real_samples):
         total_contribution_real = real_samples.loc[index].sum()
         total_contribution = row.sum()
 
-        to_remove = [sig for sig in exp.columns if (row[sig] / total_contribution) < 0.0001]
-        to_test = [sig for sig in exp.columns if 0.0001 <= (row[sig] / total_contribution) <= 0.05]
+        to_remove = [sig for sig in exp.columns if (row[sig] / (total_contribution + 1e-15)) < 0.0001]
+        to_test = [sig for sig in exp.columns if 0.0001 <= (row[sig] / (total_contribution + 1e-15)) <= 0.05]
 
         row[to_remove] = 0
         
         initial_exp_sample = row.copy()
         initial_exp_sample[to_test] = 0
 
-        norm_initial_exp_sample = initial_exp_sample / total_contribution
+        norm_initial_exp_sample = initial_exp_sample / (total_contribution + 1e-15)
         norm_initial_exp_sample = norm_initial_exp_sample * total_contribution_real
 
         initial_pred_sample = norm_initial_exp_sample.dot(cosmic_sig)
@@ -181,7 +181,7 @@ def process_signatures(exp, cosmic_sig, real_samples):
                 test_exp_sample = initial_exp_sample.copy()
                 test_exp_sample[sig] = row[sig]
 
-                norm_test_exp_sample = test_exp_sample / test_exp_sample.sum()
+                norm_test_exp_sample = test_exp_sample / (test_exp_sample.sum() + 1e-15)
                 norm_test_exp_sample = norm_test_exp_sample * total_contribution_real
 
                 test_pred_sample = norm_test_exp_sample.dot(cosmic_sig)
