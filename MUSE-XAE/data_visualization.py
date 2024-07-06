@@ -142,44 +142,53 @@ def plot_exposures(exposures,save_to):
             plt.close(fig)
 
 
-def plot_exposures_dist(exposures,save_to):
-
-    data=exposures.copy()
+def plot_exposures_dist(exposures, save_to):
+    data = exposures.copy()
 
     non_zero_counts = (data != 0).sum()
-
     total_samples = data.shape[0]
 
     filtered_columns = non_zero_counts[non_zero_counts > 0].index
     filtered_data = data[filtered_columns]
 
-    data_to_plot = [filtered_data[col][filtered_data[col]>0] for col in filtered_columns]
+    data_to_plot = [filtered_data[col][filtered_data[col] > 0] for col in filtered_columns]
 
-    # Crea il plot
-    fig, ax = plt.subplots(figsize=(15, 8)) 
+    num_columns = len(filtered_columns)
+    columns_per_page = 20
+    num_pages = (num_columns + columns_per_page - 1) // columns_per_page
 
-    bp = ax.boxplot(data_to_plot, patch_artist=True, vert=True, showfliers=True, positions=range(len(filtered_columns)))
+    with PdfPages(f'{save_to}Exposures_distribution.pdf') as pdf:
+        for page in range(num_pages):
+            start = page * columns_per_page
+            end = min(start + columns_per_page, num_columns)
+            current_columns = filtered_columns[start:end]
+            current_data_to_plot = data_to_plot[start:end]
 
-    colors = plt.cm.viridis(np.linspace(0, 1, len(filtered_columns)))
-    for patch, color in zip(bp['boxes'], colors):
-        patch.set_facecolor(color)
+            fig, ax = plt.subplots(figsize=(15, 8))
 
-    ax.set_xticks(range(len(filtered_columns)))
-    ax.set_xticklabels([''] * len(filtered_columns))  
+            bp = ax.boxplot(current_data_to_plot, patch_artist=True, vert=True, showfliers=True, positions=range(len(current_columns)))
 
-    for i, col in enumerate(filtered_columns):
-        label = fr"$\frac{{{non_zero_counts[col]}}}{{{total_samples}}}$"
-        ax.text(i, -0.02, label, ha='center', va='top', transform=ax.get_xaxis_transform(), rotation=0, fontsize=15)
+            colors = plt.cm.viridis(np.linspace(0, 1, len(current_columns)))
+            for patch, color in zip(bp['boxes'], colors):
+                patch.set_facecolor(color)
 
-    for i, col in enumerate(filtered_columns):
-        ax.text(i, ax.get_ylim()[1]*2, col, ha='center', va='bottom', rotation=45, fontsize=14)
+            ax.set_xticks(range(len(current_columns)))
+            ax.set_xticklabels([''] * len(current_columns))
 
-    ax.set_xlabel('')
-    ax.set_ylabel('Number of SBS mutations')
-    ax.set_yscale('log')
+            for i, col in enumerate(current_columns):
+                label = fr"$\frac{{{non_zero_counts[col]}}}{{{total_samples}}}$"
+                ax.text(i, -0.02, label, ha='center', va='top', transform=ax.get_xaxis_transform(), rotation=0, fontsize=15)
 
-    plt.tight_layout()
-    plt.savefig(f'{save_to}Exposures_distribution.pdf',bbox_inches='tight')
+            for i, col in enumerate(current_columns):
+                ax.text(i, ax.get_ylim()[1] * 2, col, ha='center', va='bottom', rotation=45, fontsize=14)
+
+            ax.set_xlabel('')
+            ax.set_ylabel('Number of SBS mutations')
+            ax.set_yscale('log')
+
+            plt.tight_layout()
+            pdf.savefig(fig)
+            plt.close(fig)
 
 
 
