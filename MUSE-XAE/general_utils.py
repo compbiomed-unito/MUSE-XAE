@@ -136,14 +136,10 @@ def refit(data,S,best,save_to='./',refit_patience=100,refit_penalty=1e-3,refit_r
     exp_t=process_signatures(exp_t.reset_index(drop=True),S.T.reset_index(drop=True),pd.DataFrame(original_data))
     exp_t=exp_t.apply(lambda x:x/sum(x),axis=1).reset_index(drop=True)
     
-
     E=exp_t.mul(list(sample_sum),axis=0)
-    E.columns=S.T.index
-    
-    E.to_csv(f'{save_to}exp_pre_round.csv')
+    E.columns=S.T.index    
     E=E.round() 
     E.fillna(0,inplace=True)
-    E.to_csv(f'{save_to}exp_post_round.csv')
 
     return E
 
