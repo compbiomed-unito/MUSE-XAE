@@ -243,7 +243,7 @@ def consensus_refit(exposures,X):
             else: consensus_matrix.at[index, col] = 0  
     
     sample_sum=X.sum(axis=1)
-    consensus_matrix=consensus_matrix.apply(lambda x:x/sum(x),axis=1).reset_index(drop=True)
+    consensus_matrix=consensus_matrix.apply(lambda x:x/(sum(x)+1e-15),axis=1).reset_index(drop=True)
     consensus_matrix=consensus_matrix.mul(list(sample_sum),axis=0)
     consensus_matrix=consensus_matrix.round() 
     consensus_matrix.fillna(0,inplace=True)
