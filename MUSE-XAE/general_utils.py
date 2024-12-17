@@ -215,8 +215,7 @@ def refit_process(X,S,Models_dir,refit_patience,refit_penalty,refit_regularizer,
     return E
 
 
-def consensus_refit(exposures,X):
-
+def consensus_refit(exposures, X):
     print(' ')
     print('--------------------------------------------------')
     print(' ')
@@ -238,15 +237,43 @@ def consensus_refit(exposures,X):
             if consensus_mask[col]:
                 values = [row[col] for row, mask in zip(rows, masks) if mask[col]]
 
-                if values:consensus_matrix.at[index, col] = np.median(values)
-                else: consensus_matrix.at[index, col] = 0 
-            else: consensus_matrix.at[index, col] = 0  
-    
-    sample_sum=X.sum(axis=1)
-    consensus_matrix=consensus_matrix.apply(lambda x:x/(sum(x)+1e-15),axis=1).reset_index(drop=True)
-    consensus_matrix=consensus_matrix.mul(list(sample_sum),axis=0)
-    consensus_matrix=consensus_matrix.round() 
-    consensus_matrix.fillna(0,inplace=True)
+                if values: 
+                    consensus_matrix.at[index, col] = np.median(values)
+                else: 
+                    consensus_matrix.at[index, col] = 0 
+            else: 
+                consensus_matrix.at[index, col] = 0  
+
+    # Compute the sum of X rows
+    sample_sum = X.sum(axis=1)
+    #sample_sum.to_csv('fatte_vede.csv')
+
+    # Handle rows with zero sample_sum
+    for idx in consensus_matrix.index:
+        if sample_sum[idx] == 0:
+            # Check if there are non-zero values in any of the exposures for the row
+            non_zero_values = [
+                df.loc[idx].replace(0, np.nan).min(skipna=True)
+                for df in exposures
+            ]
+            # Get the minimum non-zero value across all exposures for the row
+            min_value = min([val for val in non_zero_values if not pd.isna(val)], default=0)
+
+            # Assign the minimum value or leave as zero if all exposures are zero
+            if min_value > 0:
+                consensus_matrix.loc[idx] = min_value
+            else:
+                consensus_matrix.loc[idx] = 0
+
+    # Normalize rows where sum is not zero
+    consensus_matrix = consensus_matrix.apply(
+        lambda x: x / sum(x) if sum(x) != 0 else x, axis=1
+    ).reset_index(drop=True)
+
+    consensus_matrix = consensus_matrix.mul(list(sample_sum), axis=0)
+
+    consensus_matrix = consensus_matrix.round()
+    consensus_matrix.fillna(0, inplace=True)
 
     return consensus_matrix
 
