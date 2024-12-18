@@ -1,6 +1,6 @@
 import pandas as pd
 import os
-from general_utils import refit,consensus_refit,refit_process
+from general_utils import refit,consensus_refit,refit_process,row_wise_cosine_similarity,l2_norm,row_wise_pearson_similarity
 from data_preprocessing import load_dataset
 from data_visualization import plot_exposures,plot_exposures_dist
 import tensorflow.python.util.deprecation as deprecation
@@ -47,6 +47,9 @@ def signature_assignment(args):
         Plot_dir=f'{Main_dir}/Plots/'
         os.makedirs(Plot_dir,exist_ok=True)
   
+        Stats_dir=f'{Main_dir}/Statistics/'
+        os.makedirs(Stats_dir,exist_ok=True)
+
         Exposures_dir=f'{Main_dir}/Signature_Exposures/'
         os.makedirs(Exposures_dir,exist_ok=True)
         
@@ -74,6 +77,14 @@ def signature_assignment(args):
         plot_exposures(consensus_exposures,save_to=Plot_dir)
         plot_exposures_dist(consensus_exposures,save_to=Plot_dir)
 
+        df_statistics=pd.DataFrame(X.sum(axis=1))
+        df_statistics.reset_index(inplace=True)
+        df_statistics.columns=['Sample','Mutations']
+        df_statistics['Cosine Similarity']=row_wise_cosine_similarity(consensus_exposures.dot(S.T),X)
+        df_statistics['L2 Norm']=l2_norm(consensus_exposures.dot(S.T),X)
+        df_statistics['Pearson Correlation']=row_wise_pearson_similarity(consensus_exposures.dot(S.T),X)
+
+        df_statistics.to_csv(f'{Stats_dir}/Assignment_Statistics.txt',sep='\t',index=False)
 
         print(' ')
         print('Thank you for using MUSE-XAE! Check the results on the Experiments folder')

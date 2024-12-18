@@ -278,5 +278,13 @@ def consensus_refit(exposures, X):
     return consensus_matrix
 
 
+def row_wise_cosine_similarity(A, B):
+    similarities = cosine_similarity(A, B)
+    return np.diag(similarities)
 
+def row_wise_pearson_similarity(A, B):
+    return np.array([np.corrcoef(A.iloc[i], B.iloc[i])[0, 1] for i in range(len(A))])
+
+def l2_norm(A,B):
+    return np.linalg.norm(A-B,axis=1)
 
