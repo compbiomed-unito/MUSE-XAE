@@ -283,8 +283,26 @@ def row_wise_cosine_similarity(A, B):
     return np.diag(similarities)
 
 def row_wise_pearson_similarity(A, B):
-    return np.array([np.corrcoef(A.iloc[i], B.iloc[i])[0, 1] for i in range(len(A))])
+    # Ensure A and B are numpy arrays
+    A = A.to_numpy() if isinstance(A, pd.DataFrame) else np.array(A)
+    B = B.to_numpy() if isinstance(B, pd.DataFrame) else np.array(B)
+    
+    # Compute row-wise Pearson correlation
+    return np.array([np.corrcoef(A[i], B[i])[0, 1] for i in range(len(A))])
 
-def l2_norm(A,B):
-    return np.linalg.norm(A-B,axis=1)
+def l2_norm(A, B):
+    # Ensure A and B are numpy arrays
+    A = A.to_numpy() if isinstance(A, pd.DataFrame) else np.array(A)
+    B = B.to_numpy() if isinstance(B, pd.DataFrame) else np.array(B)
+    
+    # Compute row-wise L2 norm
+    return np.linalg.norm(A - B, axis=1)
 
+def compute_statistics(X,A,B,Stats_dir):
+    df_statistics=pd.DataFrame(X.sum(axis=1))
+    df_statistics.reset_index(inplace=True)
+    df_statistics.columns=['Sample','Mutations']
+    df_statistics['Cosine Similarity']=row_wise_cosine_similarity(A.dot(B.T),X)
+    df_statistics['L2 Norm']=l2_norm(A.dot(B.T),X)
+    df_statistics['Pearson Correlation']=row_wise_pearson_similarity(A.dot(B.T),X)
+    df_statistics.to_csv(f'{Stats_dir}/Output_Statistics.txt',sep='\t',index=False)

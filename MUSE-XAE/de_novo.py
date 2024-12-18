@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import os
 from data_preprocessing import load_dataset
-from general_utils import optimal_model,optimal_cosine_similarity,refit
+from general_utils import optimal_model,optimal_cosine_similarity,refit,compute_statistics
 from data_visualization import plot_optimal_solution,plot_results,plot_exposures
 import warnings
 import os
@@ -44,6 +44,9 @@ def denovo_extraction(args):
 
     Plot_dir=f'{Main_dir}/Plots/'
     os.makedirs(Plot_dir,exist_ok=True)
+
+    Stats_dir=f'{Main_dir}/Suggested_SBS_De_Novo/Statistics/'
+    os.makedirs(Stats_dir,exist_ok=True)
 
     parameters = vars(args)
 
@@ -104,4 +107,7 @@ def denovo_extraction(args):
             tumour_types=None
             
     index_signatures=X.columns
+
+
+    compute_statistics(X,E,S,Stats_dir)
     plot_results(X,S=S,E=E,sig_index=index_signatures,tumour_types=tumour_types,save_to=Main_dir+'/',cosmic_version=cosmic_version)
