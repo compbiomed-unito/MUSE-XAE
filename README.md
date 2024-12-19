@@ -7,7 +7,7 @@ published in Bioinformatics (https://doi.org/10.1093/bioinformatics/btae320)
 
 ## Instructions
 
-After downloading the repository we suggest to create a conda environment with python 3.10 and 1.24.3 numpy consequently install the requirement libraries via pip, folliwing the step:
+After downloading the repository we suggest to create a conda environment with python 3.10 and 1.24.3 numpy consequently install the requirement libraries via pip, following the step:
 
 - Create the environment: `conda create -n MUSE_env python=3.10 numpy=1.24.3`
 
